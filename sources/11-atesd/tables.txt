@@ -1,0 +1,64 @@
+TABLE S3.E1
+ | \mathcal{L}_{\text{OPSD}}(\theta)=\mathbb{E}_{(x,y^{\star})\sim\mathcal{S}}\;\mathbb{E}_{\hat{y}\sim p_{\mathrm{S}}(\cdot|x)}\left[\frac{1}{|\hat{y}|}\sum_{n=1}^{|\hat{y}|}\KL\!\left(p_{\mathrm{T}}(\cdot\mid x,y^{\star},\hat{y}_{<n})\;\|\;p_{\mathrm{S}}(\cdot\mid x,\hat{y}_{<n})\right)\right], |  | (1)
+
+TABLE S3.E2
+ | \text{truncate}(y^{\star},\alpha)=\left(y^{\star}_{\text{reason}}[1:\lfloor\alpha\cdot|y^{\star}_{\text{reason}}|\rfloor],\;y^{\star}_{\text{answer}}\right), |  | (2)
+
+TABLE S3.E3
+ | p_{\mathrm{T}}^{\alpha}(\cdot\mid x,y^{\star})\triangleq p_{\theta}\!\left(\cdot\mid x,\;\text{truncate}(y^{\star},\alpha)\right). |  | (3)
+
+TABLE S3.E4
+ | M(\alpha)=\mathbb{E}_{(x,y^{\star})\sim\mathcal{S}}\;\mathbb{E}_{\hat{y}\sim p_{\mathrm{S}}(\cdot|x)}\left[\frac{1}{|\hat{y}|}\sum_{n=1}^{|\hat{y}|}\KL\!\left(p_{\mathrm{T}}^{\alpha}(\cdot\mid x,y^{\star},\hat{y}_{<n})\;\|\;p_{\mathrm{S}}(\cdot\mid x,\hat{y}_{<n})\right)\right]. |  | (4)
+
+TABLE S4.E5
+ | \displaystyle\tilde{y^{\star}}_{\alpha_{t}} | \displaystyle=\operatorname{truncate}(y^{\star},\alpha_{t}), |  | (5)
+ | \displaystyle q_{\mathrm{T}}^{\alpha_{t}}(x,y^{\star}) | \displaystyle=[\,x;\tilde{y^{\star}}_{\alpha_{t}};\tau\,], | 
+
+TABLE S4.E6
+ | \mathcal{L}_{\text{ATESD}}(\theta;\alpha_{t})=\mathbb{E}_{(x,y^{\star})\sim\mathcal{S},\;\hat{y}\sim p_{\mathrm{S}}(\cdot\mid x)}\!\left[\frac{1}{|\hat{y}|}\sum_{n=1}^{|\hat{y}|}\KL\!\left(p_{\mathrm{T}}^{\alpha_{t}}(\cdot\mid x,y^{\star},\hat{y}_{<n})\;\|\;p_{\mathrm{S}}(\cdot\mid x,\hat{y}_{<n})\right)\right]. |  | (6)
+
+TABLE S4.E7
+ | (a_{t},b_{t})=1+\operatorname{softplus}(f_{\phi}(s_{t})),\qquad\alpha_{t}\sim\Beta(a_{t},b_{t}),\qquad\alpha_{t}\leftarrow\operatorname{clip}(\alpha_{t},\alpha_{\min},\alpha_{\max}). |  | (7)
+
+TABLE S4.E8
+ | \displaystyle G_{\text{lp}}(t_{0}) | \displaystyle=\sum_{i=1}^{L}\gamma^{i-1}\max\!\left(0,\ell_{t_{0}+i-1}-\ell_{t_{0}+i}\right), |  | (8)
+ | \displaystyle G_{\text{gt}}(t_{0}) | \displaystyle=\frac{\sum_{i=1}^{L}\gamma^{i-1}g_{t_{0}+i}}{\sum_{i=1}^{L}\gamma^{i-1}}, | 
+ | \displaystyle R(t_{0}) | \displaystyle=G_{\text{lp}}(t_{0})+\lambda_{\text{gt}}G_{\text{gt}}(t_{0}). | 
+
+TABLE S4.E9
+ | A_{j}=\frac{R_{j}-\bar{R}}{\operatorname{Std}(R)+\epsilon},\qquad\mathcal{L}_{\text{ctrl}}=-\frac{1}{B}\sum_{j=1}^{B}A_{j}\log\pi_{\phi}(\alpha_{j}\mid s_{j})+c_{t}\max\!\left(0,\mathcal{H}[\pi_{\phi}]-\mathcal{H}_{\text{target}}\right)^{2}. |  | (9)
+
+TABLE S5.T1.7
+Method | AIME 24 | AIME 25 | HMMT 25 | Average
+Qwen3-1.7B
+Base (Instruct) [ 20 ] | 51.5 | 36.7 | 23.1 | 37.1
++ SFT [ 19 ] | 48.4 | 36.3 | 22.7 | 35.8
++ GRPO [ 26 ] | 51.1 | 38.3 | 23.7 | 37.7
++ OPSD [ 35 ] | 57.2 | 43.9 | 29.2 | 43.4
++ Ours | 59.17 ±0.8 | 44.72 ±0.28 | 29.17 ±1.37 | 44.35 ±0.23
+Qwen3-4B
+Base (Instruct) [ 20 ] | 74.9 | 66.4 | 42.2 | 61.2
++ SFT [ 19 ] | 70.2 | 62.3 | 43.4 | 58.6
++ GRPO [ 26 ] | 75.6 | 68.1 | 44.4 | 62.7
++ OPSD [ 35 ] | 76.4 | 68.3 | 46.1 | 63.6
++ Ours | 78.06 ±0.43 | 71.39 ±0.48 | 47.50 ±0.89 | 65.65 ±1.04
+Qwen3-8B
+Base (Instruct) [ 20 ] | 75.8 | 65.6 | 43.9 | 61.8
++ SFT [ 19 ] | 72.3 | 64.2 | 42.9 | 59.8
++ GRPO [ 26 ] | 76.4 | 68.9 | 46.7 | 64.0
++ OPSD [ 35 ] | 77.8 | 70.8 | 45.8 | 64.8
++ Ours | 80.56 ±0.70 | 72.50 ±0.32 | 48.33 ±0.28 | 67.13 ±0.32
+
+TABLE S5.T2.11.2
+Controller signal | Avg@12
+Immediate one-step | 52.22
+Short-horizon delayed | 56.11
+Discounted lookahead | 58.06
+Full delayed reward (ATESD) | 59.17
+
+TABLE S5.T2.12.2
+Policy | Avg@12
+OPSD full exposure \alpha=1.0 | 57.20
+Best fixed \alpha=0.5 | 57.44
+Stochastic exposure | 54.94
+Learned policy | 59.17

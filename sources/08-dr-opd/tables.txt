@@ -1,0 +1,192 @@
+TABLE S2.E2
+ | \min_{\theta}D(\theta):=\mathbb{E}\left[\sum_{t}\KL\left(p_{\theta}(\cdot\mid s_{t})\,\|\,p^{*}(\cdot\mid s_{t})\right)\right], |  | (2)
+
+TABLE S2.Ex1
+ | \KL\left(p_{\theta}(\cdot\mid s)\,\|\,p^{*}(\cdot\mid s)\right)=\sum_{v}p_{\theta}(v\mid s)\log\frac{p_{\theta}(v\mid s)}{p^{*}(v\mid s)}, | 
+
+TABLE S2.EGx1
+ |  | \displaystyle\KL_{w(s,\cdot)}\!\left(p_{\theta}(\cdot\mid s)\,\|\,p^{*}(\cdot\mid s)\right) | 
+ |  | \displaystyle\qquad:=\sum_{v}w(s,v)\left[p_{\theta}(v\mid s)\log\frac{p_{\theta}(v\mid s)}{p^{*}(v\mid s)}-p_{\theta}(v\mid s)+p^{*}(v\mid s)\right]. |  | (3)
+
+TABLE S2.E4
+ | \min_{\theta}D_{w}(\theta):=\mathbb{E}\!\left[\sum_{t}\KL_{w(s_{t},\cdot)}\!\left(p_{\theta}(\cdot\mid s_{t})\,\|\,p^{*}(\cdot\mid s_{t})\right)\right]. |  | (4)
+
+TABLE S2.Ex3
+ | D_{w}(\theta)\geq 0. | 
+
+TABLE S3.Ex4
+ | R(\theta):=\mathbb{E}_{x,\;y\sim p_{\theta}(\cdot\mid x)}\bigl[V(x,y)\bigr]. | 
+
+TABLE S3.E5
+ | {\max_{w_{\min}\leq w\leq w_{\max}}R\!\left(\theta^{*}(w)\right)\qquad\text{subject to}\qquad\theta^{*}(w)\in\arg\min_{\theta}D_{w}(\theta).} |  | (5)
+
+TABLE S3.Ex5
+ | w_{t}:=w(s_{t},y_{t}),\qquad p_{t}(\bar{\theta}):=p_{\bar{\theta}}(y_{t}\mid s_{t}),\qquad p_{t}^{*}:=p^{*}(y_{t}\mid s_{t}). | 
+
+TABLE S3.E6
+ | -\nabla_{\theta}D_{w}(\bar{\theta})=\mathbb{E}\!\left[\sum_{t}w_{t}g_{t}\right],\quad\textrm{where}\quad g_{t}:=\log\frac{p_{t}^{*}}{p_{t}(\bar{\theta})}\left.\nabla_{\theta}\log p_{\theta}(y_{t}\mid s_{t})\right|_{\theta=\bar{\theta}}. |  | (6)
+
+TABLE S3.E7
+ | \theta^{+}(w):=\bar{\theta}-\eta\nabla D_{w}(\bar{\theta})=\bar{\theta}+\eta\,\mathbb{E}\!\left[\sum_{t}w_{t}g_{t}\right], |  | (7)
+
+TABLE S3.Ex6
+ | \theta_{\mathrm{vani}}^{+}:=\theta^{+}(1). | 
+
+TABLE S3.E8
+ | c_{t}:=\frac{1}{\eta}\left.\frac{\partial R\!\left(\theta^{+}(w)\right)}{\partial w_{t}}\right|_{w\equiv 1}=g_{t}^{\top}\nabla R\!\left(\theta_{\mathrm{vani}}^{+}\right), |  | (8)
+
+TABLE S3.E9
+ | R\!\left(\theta^{+}(w)\right)\geq R\!\left(\theta_{\mathrm{vani}}^{+}\right)+\eta\,\mathbb{E}\!\left[\sum_{t}\left((w_{t}-1)c_{t}-\frac{(w_{t}-1)^{2}}{2\lambda}\right)\right]. |  | (9)
+
+TABLE S3.E10
+ | w_{t}^{+}=\operatorname{clip}\left(1+\lambda c_{t},\,w_{\min},\,w_{\max}\right). |  | (10)
+
+TABLE S3.E11
+ | R\!\left(\theta^{+}(w^{+})\right)-R\!\left(\theta_{\mathrm{vani}}^{+}\right)\geq\frac{\eta}{2\lambda}\mathbb{E}\!\left[\sum_{t}(w_{t}^{+}-1)^{2}\right]\geq 0. |  | (11)
+
+TABLE S4.Ex7
+ | \widehat{r}:=\frac{1}{|\mathcal{B}|}\sum_{(x,y)\in\mathcal{B}}A(x,y)\sum_{t}\left.\nabla_{\theta}\log p_{\theta}(y_{t}\mid s_{t})\right|_{\theta=\bar{\theta}}, | 
+
+TABLE S4.E12
+ | g_{t}=d_{t}\left.\nabla_{\theta}\log p_{\theta}(y_{t}\mid s_{t})\right|_{\theta=\bar{\theta}},\qquad d_{t}:=\log\frac{p^{*}(y_{t}\mid s_{t})}{p_{\bar{\theta}}(y_{t}\mid s_{t})}\in\mathbb{R}. |  | (12)
+
+TABLE S4.E13
+ | \widehat{c}_{t}=d_{t}\left\langle\left.\nabla_{\theta}\log p_{\theta}(y_{t}\mid s_{t})\right|_{\theta=\bar{\theta}},\widehat{r}\right\rangle=d_{t}\left.\frac{\mathrm{d}}{\mathrm{d}\epsilon}\log p_{\bar{\theta}+\epsilon\widehat{r}}(y_{t}\mid s_{t})\right|_{\epsilon=0}, |  | (13)
+
+TABLE S4.E14
+ | \widehat{w}_{t}=\clip\!\left(1+\lambda\frac{\widehat{c}_{t}}{\max(\sigma,\epsilon)},\,w_{\min},\,w_{\max}\right), |  | (14)
+
+TABLE S5.Ex8
+ | (\text{Base},\text{Instruct}),\quad(\text{Instruct},\text{Instruct}),\quad(\text{Base},\text{RL}),\quad(\text{Instruct},\text{RL}), | 
+
+TABLE A1.T4.2
+Hyperparameter | Value
+Learning rate | 1\times 10^{-5}
+LR schedule | constant
+Gradient clipping | 1.0
+Batch / Mini-batch size | 128
+Rollouts per prompt K | 8
+Rollouts per step | 1024
+Max prompt length | 1024 tokens
+Max response length | 12288 tokens
+Temperature | 1.0
+
+TABLE A1.T5.2
+Method | Hyperparameters
+OPD | None
+ExOPD | \lambda=1.25 ; the initial student as reference policy
+OPD+GRPO | Equal weighting (1:1) of the distillation and outcome terms
+GRPD | None (default settings of the released method)
+Dr. OPD | \lambda=0.4 ; w_{\min}=0.001 ; w_{\max}=3
+
+TABLE A2.Ex1
+ | \overline{r}_{b}=\frac{1}{K}\sum_{i=1}^{K}r_{bi},\qquad s_{b}=\left[\frac{1}{K-1}\sum_{i=1}^{K}(r_{bi}-\overline{r}_{b})^{2}\right]^{1/2},\qquad A_{bi}=\frac{r_{bi}-\overline{r}_{b}}{s_{b}+\epsilon_{A}}. | 
+
+TABLE A2.Ex2
+ | G_{k}=\sum_{b}\frac{1}{K}\sum_{i=1}^{K}\frac{A_{bi}}{T_{bi}}\sum_{t=1}^{T_{bi}}\left.\nabla_{\theta}\log p_{\theta}(y_{bi,t}\mid s_{bi,t})\right|_{\theta=\bar{\theta}_{k}}, | 
+
+TABLE A2.Ex3
+ | m_{k}^{R}=\beta_{1}m_{k-1}^{R}+(1-\beta_{1})G_{k},\qquad m_{0}^{R}=0. | 
+
+TABLE A2.Ex4
+ | u_{k}=\frac{\widehat{m}_{k-1}^{R}}{\sqrt{\widehat{v}^{\mathrm{actor}}}+\epsilon_{\mathrm{Adam}}}, | 
+
+TABLE A2.EGx2
+ | \displaystyle d_{bi,t} | \displaystyle=\log\frac{p^{*}(y_{bi,t}\mid s_{bi,t})}{p_{\bar{\theta}_{k}}(y_{bi,t}\mid s_{bi,t})}, | 
+ | \displaystyle\widehat{c}_{bi,t} | \displaystyle=d_{bi,t}\left.\frac{\mathrm{d}}{\mathrm{d}\alpha}\log p_{\bar{\theta}_{k}+\alpha u_{k}}(y_{bi,t}\mid s_{bi,t})\right|_{\alpha=0}=g_{bi,t}^{\top}u_{k}. | 
+
+TABLE A2.Ex7
+ | \mathcal{I}_{kb}=\{(i,t):1\leq i\leq K,\ 1\leq t\leq T_{bi}\},\qquad N_{kb}=|\mathcal{I}_{kb}|=\sum_{i=1}^{K}T_{bi}. | 
+
+TABLE A2.Ex8
+ | \boxed{\sigma_{kb}=\left(\frac{1}{N_{kb}}\sum_{i=1}^{K}\sum_{t=1}^{T_{bi}}\widehat{c}_{bi,t}^{\,2}\right)^{1/2}}\qquad(N_{kb}>0). | 
+
+TABLE A2.Ex9
+ | \widehat{w}_{bi,t}=\clip\!\left(1+\lambda\frac{\widehat{c}_{bi,t}}{\max(\sigma_{kb},\epsilon_{\sigma})},\,0.001,\,3\right),\qquad\lambda=0.4 | 
+
+TABLE A3.Ex1
+ | \mathcal{W}=\{w:w_{\min}\leq w(s,v)\leq w_{\max}\},\qquad 0<w_{\min}<1<w_{\max}<\infty. | 
+
+TABLE A3.E1
+ | D_{w}^{\bar{\theta}}(\theta):=\mathbb{E}_{x,\,y\sim p_{\bar{\theta}}(\cdot\mid x)}\left[\sum_{t}\KL_{w(s_{t},\cdot)}\bigl(p_{\theta}(\cdot\mid s_{t})\|p^{*}(\cdot\mid s_{t})\bigr)\right]. |  | (C.1)
+
+TABLE A3.Ex2
+ | \int f(s,v)\,\mathrm{d}\mu(s,v):=\mathbb{E}_{x,\,y\sim p_{\bar{\theta}}(\cdot\mid x)}\left[\sum_{t=1}^{T}f(s_{t},y_{t})\right] | 
+
+TABLE A3.Ex3
+ | \mathbb{E}_{\mu}[T]<\infty. | 
+
+TABLE A3.Ex4
+ | \nabla_{\theta}D_{w}(\theta)=\mathbb{E}_{\mu}\!\left[\nabla_{\theta}\ell_{w}(\theta;Z)\right],\qquad w\in\mathcal{W}, | 
+
+TABLE A3.Ex5
+ | M:=\mathbb{E}_{\mu}\!\left[\sum_{t=1}^{T}\|g_{t}\|^{2}\right]<\infty. | 
+
+TABLE A3.Ex6
+ | \{\bar{\theta}\}\cup\{\theta^{+}(w):w\in\mathcal{W}\}\subset U, | 
+
+TABLE A3.Ex7
+ | \|\nabla R(\theta)-\nabla R(\theta^{\prime})\|\leq L_{R}\|\theta-\theta^{\prime}\|,\qquad\forall\,\theta,\theta^{\prime}\in U. | 
+
+TABLE A3.Ex8
+ | \|\theta^{+}(w)-\bar{\theta}\|\leq\eta w_{\max}\sqrt{\mathbb{E}[T]M}. | 
+
+TABLE A3.Ex9
+ | \nabla R(\theta)=\mathbb{E}_{x,\,y\sim p_{\theta}}\left[V(x,y)\sum_{t}\nabla_{\theta}\log p_{\theta}(y_{t}\mid s_{t})\right]. | 
+
+TABLE A3.Ex10
+ | d(a,b)=a\log(a/b)-a+b=b\phi(a/b),\qquad\phi(u)=u\log u-u+1. | 
+
+TABLE A3.Ex11
+ | \KL_{w(s,\cdot)}(p_{\theta}\|p^{*})=\sum_{v}w(s,v)d\bigl(p_{\theta}(v\mid s),p^{*}(v\mid s)\bigr)\geq 0. | 
+
+TABLE A3.EGx3
+ | \displaystyle\nabla_{\theta}\KL_{w(s,\cdot)}(p_{\theta}\|p^{*}) | \displaystyle=\sum_{v}w(s,v)\bigl[\log(p_{v}/q_{v})+1-1\bigr]\nabla_{\theta}p_{v} | 
+ |  | \displaystyle=\sum_{v}p_{v}w(s,v)\log(p_{v}/q_{v})\nabla_{\theta}\log p_{v}. | 
+
+TABLE A3.Ex14
+ | -\nabla D_{w}(\bar{\theta})=\mathbb{E}\left[\sum_{t}w_{t}\log\frac{p_{t}^{*}}{p_{t}(\bar{\theta})}\left.\nabla_{\theta}\log p_{\theta}(y_{t}\mid s_{t})\right|_{\theta=\bar{\theta}}\right]=\mathbb{E}\left[\sum_{t}w_{t}g_{t}\right]. | 
+
+TABLE A3.Ex15
+ | \widehat{D}_{w}(\theta;x,y):=\sum_{t}\frac{w_{t}}{p_{t}(\bar{\theta})}\left[p_{t}(\theta)\log\frac{p_{t}(\theta)}{p_{t}^{*}}-p_{t}(\theta)+p_{t}^{*}\right], | 
+
+TABLE A3.Ex16
+ | \left.\frac{\mathrm{d}}{\mathrm{d}\epsilon}\log p_{\bar{\theta}+\epsilon g_{t}}(y_{t}\mid s_{t})\right|_{\epsilon=0}=\log\frac{p_{t}^{*}}{p_{t}(\bar{\theta})}\,\|z_{t}\|^{2}. | 
+
+TABLE A3.EGx4
+ | \displaystyle D_{w}(\theta^{+}(w)) | \displaystyle\leq D_{w}(\bar{\theta})-\eta\left(1-\frac{\eta L_{D}}{2}\right)\|\nabla D_{w}(\bar{\theta})\|^{2} | 
+ |  | \displaystyle\leq D_{w}(\bar{\theta})-\frac{\eta}{2}\|\nabla D_{w}(\bar{\theta})\|^{2}. | 
+
+TABLE A3.Ex19
+ | \Theta(w):=\argmin_{\theta\in\mathcal{P}}D_{w}(\theta). | 
+
+TABLE A3.E2
+ | \max_{w\in\mathcal{W}}\;\max_{\theta\in\Theta(w)}R(\theta). |  | (C.2)
+
+TABLE A3.Ex20
+ | \theta^{+}(1+\epsilon h)=\theta_{\mathrm{vani}}^{+}+\eta\epsilon\int hg\,\mathrm{d}\mu. | 
+
+TABLE A3.E3
+ | \left.\frac{\mathrm{d}}{\mathrm{d}\epsilon}F(1+\epsilon h)\right|_{\epsilon=0}=\eta\int h\,g^{\top}\nabla R(\theta_{\mathrm{vani}}^{+})\,\mathrm{d}\mu=\eta\langle h,c\rangle_{\mu}. |  | (C.3)
+
+TABLE A3.Ex21
+ | \left.\frac{\partial F(w)}{\partial w(s,v)}\right|_{w=1}=\eta\mu(\{(s,v)\})c(s,v). | 
+
+TABLE A3.Ex22
+ | \|\Delta(w)\|^{2}\leq\eta^{2}\left(\int h^{2}\,\mathrm{d}\mu\right)\left(\int\|g\|^{2}\,\mathrm{d}\mu\right)=\eta^{2}M\|h\|_{\mu}^{2}. | 
+
+TABLE A3.EGx5
+ | \displaystyle R(\theta^{+}(w))-R(\theta_{\mathrm{vani}}^{+}) | \displaystyle\geq\nabla R(\theta_{\mathrm{vani}}^{+})^{\top}\Delta(w)-\frac{L_{R}}{2}\|\Delta(w)\|^{2} | 
+ |  | \displaystyle\geq\eta\langle h,c\rangle_{\mu}-\frac{L_{R}\eta^{2}M}{2}\|h\|_{\mu}^{2}. | 
+
+TABLE A3.Ex25
+ | R(\theta^{+}(w))-R(\theta_{\mathrm{vani}}^{+})\geq\eta\int\left(hc-\frac{h^{2}}{2\lambda}\right)\,\mathrm{d}\mu, | 
+
+TABLE A3.Ex26
+ | (w-1)c-\frac{(w-1)^{2}}{2\lambda}=\frac{\lambda c^{2}}{2}-\frac{(w-1-\lambda c)^{2}}{2\lambda}. | 
+
+TABLE A3.Ex27
+ | \left(c-\frac{h^{+}}{\lambda}\right)(1-w^{+})\leq 0,\qquad h^{+}c\geq\frac{(h^{+})^{2}}{\lambda}. | 
+
+TABLE A3.Ex28
+ | R(\theta^{+}(w^{+}))-R(\theta_{\mathrm{vani}}^{+})\geq\frac{\eta}{2\lambda}\|w^{+}-1\|_{\mu}^{2}\geq 0. | 

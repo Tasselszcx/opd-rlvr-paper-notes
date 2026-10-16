@@ -1,0 +1,234 @@
+TABLE S1.E1
+ | \varphi(\pi_{\text{future}})=\varphi(\pi_{\theta})+\beta\cdot\big(\varphi(\pi_{\theta^{\prime}})-\varphi(\pi_{\theta})\big),\quad\beta>1. |  | (1)
+
+TABLE S2.E2
+ | \textstyle\mathcal{L}_{\text{PG}}=-\mathbb{E}\left[\sum_{t=1}^{T}\hat{A}_{t}\cdot\min\!\Big(\rho_{t},\operatorname{clip}(\rho_{t},1\!-\!\epsilon,1\!+\!\epsilon)\Big)\right],\quad\rho_{t}=\frac{\pi_{\theta}(y_{t}\mid x,y_{<t})}{\pi_{\text{old}}(y_{t}\mid x,y_{<t})}, |  | (2)
+
+TABLE S2.E3
+ | \textstyle\mathcal{L}_{\text{OPD}}=\mathbb{E}_{y\sim\pi_{\theta}}\left[\sum_{t=1}^{T}D_{\mathrm{KL}}\!\left(\pi_{\theta}(\cdot\mid x,y_{<t})\;\|\;\pi_{T}(\cdot\mid x,y_{<t})\right)\right]. |  | (3)
+
+TABLE S3.E4
+ | \varphi(\pi_{\text{future}})=\varphi(\pi_{\theta_{n}})+\beta\cdot\big(\varphi(\pi_{\theta_{n+1}^{\prime}})-\varphi(\pi_{\theta_{n}})\big),\quad\beta>1. |  | (4)
+
+TABLE S3.E5
+ | \textstyle\theta_{\text{future}}=\theta_{n}+\beta\cdot(\theta_{n+1}^{\prime}-\theta_{n}), |  | (5)
+
+TABLE S3.E6
+ | \log\pi_{\text{future}}(\cdot\mid s_{t})=\log\pi_{\theta_{n}}(\cdot\mid s_{t})+\beta\cdot\big(\log\pi_{\theta_{n+1}^{\prime}}(\cdot\mid s_{t})-\log\pi_{\theta_{n}}(\cdot\mid s_{t})\big)+\text{const}, |  | (6)
+
+TABLE S3.E7
+ | D_{\mathrm{KL}}(\pi_{\theta}\|\pi_{\text{future}})=-(\beta-1)\,D_{\mathrm{KL}}(\pi_{\theta}\|\pi_{\theta_{n}})+\beta\,D_{\mathrm{KL}}(\pi_{\theta}\|\pi_{\theta_{n+1}^{\prime}})+\log Z, |  | (7)
+
+TABLE S3.E8
+ | \log\pi_{\text{future}}(v\mid\cdot)=\log\pi_{\theta_{n}}(v\mid\cdot)+\beta\cdot\big(\log\pi_{\theta_{n+1}^{\prime}}(v\mid\cdot)-\log\pi_{\theta_{n}}(v\mid\cdot)\big),\quad v\in S\cup\{\text{tail}\}. |  | (8)
+
+TABLE S3.E9
+ | \textstyle\mathcal{L}_{\text{RISE}}=\mathbb{E}_{y\sim\pi_{\theta}}\!\left[\sum_{t=1}^{T}D_{\mathrm{KL}}\!\left(\pi_{\theta}(\cdot\mid s_{t})\;\|\;\mathrm{sg}\!\left[\pi_{\text{future}}(\cdot\mid s_{t})\right]\right)\right], |  | (9)
+
+TABLE S4.T1.8
+Method | In-Domain Math | OOD
+MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg. | GPQA | IFEval | MMLU | Avg.
+Qwen3-8B (DAPOMath)
+Base | 73.2 | 27.1 | 23.1 | 66.1 | 21.1 | 48.6 | 43.2 | 50.8 | 82.4 | 68.4 | 67.2
+GRPO | 83.8 | 54.4 | 42.9 | 89.4 | 31.5 | 57.9 | 60.0 | 57.0 | 81.5 | 73.3 | 70.6
+GRPO+SDPO | 83.2 | 42.3 | 32.7 | 84.4 | 30.6 | 62.5 | 55.9 | 55.7 | 82.8 | 69.4 | 69.3
+SDAR | 84.5 | 50.2 | 38.3 | 89.4 | 31.2 | 64.7 | 59.7 | 55.5 | 82.4 | 70.1 | 69.3
+RLSD | 83.0 | 53.1 | 40.0 | 90.6 | 31.3 | 60.5 | 59.8 | 56.2 | 82.6 | 72.6 | 70.5
+RISE (logit) | 84.8 | 56.9 | 46.7 | 91.6 | 32.5 | 62.4 | 62.5 | 58.2 | 81.3 | 74.3 | 71.3
+RISE (weight) | 84.4 | 58.1 | 45.8 | 91.9 | 32.6 | 63.3 | 62.7 | 59.0 | 83.4 | 73.5 | 72.0
+Qwen3-1.7B (DAPOMath)
+Base | 64.6 | 11.5 | 12.1 | 41.9 | 17.6 | 40.3 | 31.3 | 34.9 | 67.7 | 48.3 | 50.3
+GRPO | 75.6 | 30.0 | 26.3 | 65.6 | 23.9 | 51.1 | 45.4 | 32.3 | 68.8 | 53.4 | 51.5
+GRPO+SDPO | 76.0 | 21.5 | 23.1 | 65.0 | 23.1 | 50.3 | 43.2 | 34.9 | 69.0 | 52.0 | 52.0
+SDAR | 75.0 | 26.0 | 26.0 | 71.3 | 23.6 | 50.8 | 45.5 | 35.3 | 69.1 | 53.2 | 52.5
+RLSD | 75.3 | 26.7 | 25.2 | 59.4 | 23.0 | 49.8 | 43.2 | 33.4 | 67.5 | 54.1 | 51.7
+RISE (logit) | 75.2 | 36.3 | 33.3 | 78.8 | 24.9 | 52.9 | 50.2 | 34.8 | 68.2 | 53.7 | 52.2
+RISE (weight) | 77.3 | 32.9 | 31.3 | 75.0 | 25.7 | 53.3 | 49.2 | 34.8 | 70.2 | 56.3 | 53.8
+OLMo3-7B-Instruct-SFT (OpenR1)
+Base | 57.0 | 6.0 | 8.1 | 43.8 | 19.6 | 31.5 | 27.7 | 33.0 | 77.8 | 35.4 | 48.7
+GRPO | 77.5 | 30.2 | 28.3 | 70.6 | 25.2 | 53.5 | 47.6 | 31.0 | 76.0 | 46.6 | 51.2
+GRPO+SDPO | 77.7 | 33.8 | 28.5 | 70.6 | 25.3 | 53.4 | 48.2 | 37.4 | 77.1 | 46.1 | 53.5
+SDAR | 79.8 | 35.2 | 27.1 | 73.8 | 25.3 | 56.3 | 49.6 | 39.0 | 77.8 | 44.6 | 53.8
+RLSD | 77.2 | 28.3 | 24.0 | 68.1 | 24.6 | 52.9 | 45.9 | 37.6 | 78.4 | 44.1 | 53.4
+RISE (logit) | 82.9 | 46.9 | 36.0 | 83.1 | 27.6 | 61.9 | 56.4 | 40.7 | 79.3 | 46.4 | 55.5
+RISE (weight) | 82.8 | 42.5 | 32.5 | 76.9 | 27.8 | 59.6 | 53.7 | 37.1 | 77.1 | 46.9 | 53.7
+
+TABLE S4.T2.8
+Method | Math | STEM
+MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg. | GPQA | SuperGPQA | MMLU | ThrmQA | Avg.
+Base | 48.2 | 9.8 | 10.4 | 35.0 | 12.1 | 27.5 | 23.8 | 14.1 | 8.0 | 6.6 | 27.0 | 13.9
+GRPO | 69.1 | 23.8 | 20.6 | 59.4 | 26.6 | 42.0 | 40.2 | 42.4 | 32.5 | 59.5 | 47.8 | 45.5
+GRPO+SDPO | 70.5 | 24.8 | 20.4 | 68.1 | 25.9 | 43.1 | 42.1 | 44.7 | 31.0 | 61.7 | 50.5 | 47.0
+SDAR | 69.1 | 22.9 | 20.0 | 65.6 | 23.7 | 41.2 | 40.4 | 40.6 | 30.3 | 58.7 | 49.1 | 44.7
+RLSD | 68.9 | 23.1 | 20.0 | 60.0 | 24.6 | 39.9 | 39.4 | 33.7 | 28.8 | 55.1 | 46.5 | 41.0
+RISE (logit) | 71.9 | 25.6 | 22.1 | 70.6 | 25.9 | 43.8 | 43.3 | 44.1 | 32.1 | 61.9 | 51.3 | 47.4
+RISE (weight) | 71.3 | 28.8 | 25.4 | 71.3 | 26.9 | 44.9 | 44.8 | 44.7 | 32.9 | 60.9 | 51.5 | 47.5
+
+TABLE S4.T3.5
+Method | ALF | WS-S | WS-A
+Base | 21.9 | 6.7 | 0.8
+GRPO | 75.0 | 79.8 | 63.3
+RISE (logit) | 78.1 | 78.8 | 68.0
+RISE (weight) | 84.4 | 86.3 | 74.2
+
+TABLE S4.T4.6
+ | \beta_{0} (linear decay) | Schedule ( \beta_{0}\!=\!1.2 )
+ | 1.2 | 1.3 | 1.5 | cosine | linear | exp | fixed
+Math Avg | 62.5 | 62.3 | 61.9 | 63.0 | 62.5 | 62.0 | 61.8
+
+TABLE A1.E1
+ | J(\pi_{1})-J(\pi_{2})=\sum_{t=1}^{T}\mathbb{E}_{s_{t}\sim\rho^{t}_{\pi_{1}}}\!\left[\sum_{v}\left(\pi_{1}(v\mid s_{t})-\pi_{2}(v\mid s_{t})\right)Q^{\pi_{2}}(s_{t},v)\right], |  | (A.1)
+
+TABLE A1.E2
+ | J(\pi_{1})-J(\pi_{2})=\sum_{t=1}^{T}\mathbb{E}_{s_{t}\sim P_{t}^{\pi_{1}}}[\mathbb{E}_{a_{t}\sim\pi_{1}}[A^{\pi_{2}}(s_{t},a_{t})]], |  | (A.2)
+
+TABLE A1.EGx1
+ | \displaystyle\sum_{v}\pi_{1}(v|s_{t})\,A^{\pi_{2}}(s_{t},v) | \displaystyle=\sum_{v}\pi_{1}(v|s_{t})\,Q^{\pi_{2}}(s_{t},v)-V^{\pi_{2}}(s_{t})\underbrace{\sum_{v}\pi_{1}(v|s_{t})}_{=\,1} | 
+ |  | \displaystyle=\sum_{v}\pi_{1}(v|s_{t})\,Q^{\pi_{2}}(s_{t},v)-\underbrace{\sum_{v}\pi_{2}(v|s_{t})\,Q^{\pi_{2}}(s_{t},v)}_{=\,V^{\pi_{2}}(s_{t})} | 
+ |  | \displaystyle=\sum_{v}\left(\pi_{1}(v|s_{t})-\pi_{2}(v|s_{t})\right)Q^{\pi_{2}}(s_{t},v). |  | (A.3)
+
+TABLE A1.E4
+ | J(\pi^{*})-J(\pi_{\theta})\;\leq\;\underbrace{J(\pi^{*})-J(\pi_{T})}_{\text{teacher gap}}\;+\;T\cdot\underbrace{\sqrt{\bar{\mathcal{L}}_{\mathrm{OPD}}/2}}_{\text{distillation error}}, |  | (A.4)
+
+TABLE A1.E5
+ | J(\pi_{T})-J(\pi_{\theta})=\sum_{t=1}^{T}\mathbb{E}_{s_{t}\sim\rho^{t}_{\pi_{\theta}}}\!\left[\sum_{v}\left(\pi_{T}(v\mid s_{t})-\pi_{\theta}(v\mid s_{t})\right)Q^{\pi_{T}}(s_{t},v)\right]. |  | (A.5)
+
+TABLE A1.E6
+ | J(\pi_{T})-J(\pi_{\theta})\leq\sum_{t=1}^{T}\mathbb{E}_{s_{t}\sim\rho^{t}_{\pi_{\theta}}}\!\left[\mathrm{TV}(\pi_{T}(\cdot|s_{t}),\pi_{\theta}(\cdot|s_{t}))\right]. |  | (A.6)
+
+TABLE A1.E7
+ | \sum_{t=1}^{T}\mathbb{E}_{s_{t}\sim\rho^{t}_{\pi_{\theta}}}\!\left[\mathrm{TV}_{t}\right]\leq\sum_{t=1}^{T}\sqrt{\mathbb{E}_{s_{t}\sim\rho^{t}_{\pi_{\theta}}}[D_{t}]/2}=T\cdot\frac{1}{T}\sum_{t=1}^{T}\sqrt{\mathbb{E}[D_{t}]/2}, |  | (A.7)
+
+TABLE A1.E8
+ | \|\varphi(\pi_{\mathrm{future}})-\varphi(\pi^{*})\|<\|\varphi(\pi_{\theta_{n}})-\varphi(\pi^{*})\|, |  | (A.8)
+
+TABLE A1.E9
+ | \underbrace{J(\pi^{*})-J(\pi_{\theta_{n+1}})}_{\text{post-OPD}}\;\leq\;\underbrace{\gamma(\beta)}_{{<}\,1}\cdot\underbrace{L(\alpha^{*}-\alpha_{n+1}^{\prime})}_{\geq\;J(\pi^{*})-J(\pi_{\theta_{n+1}^{\prime}})\;\text{(pre-OPD)}}\;+\;T\sqrt{\bar{\mathcal{L}}_{\mathrm{OPD}}/2}, |  | (A.9)
+
+TABLE A1.E10
+ | \gamma(\beta)=\frac{\bigl|\alpha^{*}-\beta\alpha_{n+1}^{\prime}\bigr|}{\alpha^{*}-\alpha_{n+1}^{\prime}}, |  | (A.10)
+
+TABLE A1.E11
+ | J(\pi^{*})-J(\pi_{\theta_{n+1}^{\prime}})\leq L(\alpha^{*}-\alpha_{n+1}^{\prime}). |  | (A.11)
+
+TABLE A1.E12
+ | J(\pi^{*})-J(\pi_{\mathrm{future}})\leq L\bigl|\alpha^{*}-\beta\alpha_{n+1}^{\prime}\bigr|=\frac{\bigl|\alpha^{*}-\beta\alpha_{n+1}^{\prime}\bigr|}{\alpha^{*}-\alpha_{n+1}^{\prime}}\cdot L(\alpha^{*}-\alpha_{n+1}^{\prime})=\gamma(\beta)\cdot L(\alpha^{*}-\alpha_{n+1}^{\prime}). |  | (A.12)
+
+TABLE A1.E13
+ | J(\pi^{*})-J(\pi_{\theta_{n+1}})\;\leq\;\underbrace{J(\pi^{*})-J(\pi_{\mathrm{future}})}_{\leq\,\gamma(\beta)L(\alpha^{*}-\alpha_{n+1}^{\prime})}\;+\;T\sqrt{\bar{\mathcal{L}}_{\mathrm{OPD}}/2}, |  | (A.13)
+
+TABLE A2.T1.17
+ | Qwen3-1.7B | Qwen3-1.7B-Base | Qwen3-8B | Qwen3-4B-Base | Qwen3-8B-Base | OLMo3-7B-Instruct-SFT
+ | (DAPOMath) | (DAPOMath) | (DAPOMath) | (multi-domain) | (code) | (OpenR1-Math)
+Learning rate | 1e-6 | 1e-6 | 1e-6 | 1e-6 | 1e-6 | 1e-6
+Train batch size | 64 | 64 | 64 | 64 | 64 | 128
+Mini-batch size | 32 | 32 | 32 | 32 | 32 | 64
+Rollouts n | 8 | 8 | 8 | 8 | 8 | 8
+Epochs | 1 | 1 | 1 | 1 | 1 | 1
+Rollout temperature | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0
+KL coefficient | 0 | 0 | 0 | 0 | 0 | 0
+RISE \beta_{0} | 1.2 | 1.2 | 1.2 | 1.2 | 1.2 | 1.2
+RISE \beta_{N} | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0
+RISE \eta | 0.1 | 0.1 | 0.1 | 0.1 | 0.1 | 1.0
+RISE K | 100 | 100 | 100 | 100 | 20 | 100
+
+TABLE A3.T1.8
+Method | In-Domain Math | OOD
+MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg. | GPQA | IFEval | MMLU | Avg.
+Base | 40.0 | 4.4 | 2.9 | 27.5 | 11.6 | 19.8 | 17.7 | 12.7 | 14.4 | 8.0 | 11.7
+GRPO | 60.6 | 9.4 | 6.9 | 42.5 | 19.3 | 29.2 | 28.0 | 26.5 | 31.1 | 39.6 | 32.4
+GRPO+SDPO | 61.3 | 8.3 | 6.7 | 41.9 | 20.1 | 32.3 | 28.4 | 28.7 | 30.5 | 40.5 | 33.2
+SDAR | 55.6 | 9.6 | 8.3 | 43.1 | 17.7 | 27.1 | 26.9 | 23.2 | 28.5 | 42.5 | 31.4
+RLSD | 57.2 | 11.9 | 7.5 | 43.1 | 17.8 | 28.2 | 27.6 | 23.0 | 29.0 | 42.4 | 31.5
+RISE (logit) | 59.6 | 12.1 | 8.1 | 45.6 | 20.2 | 29.4 | 29.2 | 25.4 | 31.1 | 42.9 | 33.1
+RISE (weight) | 62.4 | 10.4 | 5.8 | 38.8 | 20.7 | 30.8 | 28.1 | 25.7 | 29.9 | 41.0 | 32.2
+
+TABLE A3.T2.6
+ |  | AIME’24 | AIME’25
+Model | Method | avg@16 | pass@16 | avg@16 | pass@16
+Qwen3-8B | GRPO | 54.4 | 78.7 | 42.9 | 63.3
+RISE (logit) | 56.9 +2.5 | 79.0 +0.3 | 46.7 +3.8 | 62.7 -0.6
+RISE (weight) | 58.1 +3.7 | 81.5 +2.8 | 45.8 +2.9 | 67.2 +3.9
+Qwen3-1.7B | GRPO | 30.0 | 54.4 | 26.3 | 45.8
+RISE (logit) | 36.3 +6.3 | 64.0 +9.6 | 33.3 +7.0 | 53.9 +8.1
+RISE (weight) | 32.9 +2.9 | 57.0 +2.6 | 31.3 +5.0 | 49.2 +3.4
+
+TABLE A3.T3.6
+Model | Method | MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg.
+Qwen3-8B | GRPO | 83.8 | 54.4 | 42.9 | 89.4 | 31.5 | 57.9 | 60.0
+RISE (logit) | 84.8 | 56.9 | 46.7 | 91.6 | 32.5 | 62.4 | 62.5
+RISE (weight) | 84.4 | 58.1 | 45.8 | 91.9 | 32.6 | 63.3 | 62.7
+w/o OPD | 84.6 | 51.7 | 39.8 | 90.6 | 31.2 | 64.1 | 60.3
+Qwen3-1.7B | GRPO | 75.6 | 30.0 | 26.3 | 65.6 | 23.9 | 51.1 | 45.4
+RISE (logit) | 75.2 | 36.3 | 33.3 | 78.8 | 24.9 | 52.9 | 50.2
+RISE (weight) | 77.3 | 32.9 | 31.3 | 75.0 | 25.7 | 53.3 | 49.2
+w/o OPD | 72.0 | 32.3 | 27.3 | 70.0 | 24.6 | 47.4 | 45.6
+Qwen3-1.7B -Base | GRPO | 60.6 | 9.4 | 6.9 | 42.5 | 19.3 | 29.2 | 28.0
+RISE (logit) | 59.6 | 12.1 | 8.1 | 45.6 | 20.2 | 29.4 | 29.2
+RISE (weight) | 62.4 | 10.4 | 5.8 | 38.8 | 20.7 | 30.8 | 28.1
+w/o OPD | 58.8 | 10.6 | 5.8 | 43.1 | 19.4 | 28.6 | 27.7
+
+TABLE A3.T4.6
+Configuration | MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg.
+Qwen3-8B — \beta_{0} sensitivity (linear decay)
+\beta_{0}=1.2 | 84.8 | 56.9 | 46.7 | 91.6 | 32.5 | 62.4 | 62.5
+\beta_{0}=1.3 | 83.3 | 56.9 | 47.3 | 92.5 | 32.1 | 61.9 | 62.3
+\beta_{0}=1.5 | 83.5 | 55.2 | 47.9 | 91.2 | 31.9 | 61.6 | 61.9
+Qwen3-8B — decay schedule ( \beta_{0}=1.2 )
+Linear | 84.8 | 56.9 | 46.7 | 91.6 | 32.5 | 62.4 | 62.5
+Cosine | 84.3 | 58.5 | 47.7 | 91.8 | 32.0 | 63.8 | 63.0
+Exponential | 82.4 | 57.5 | 47.1 | 91.2 | 31.7 | 61.8 | 62.0
+Fixed ( \beta\!=\!\beta_{0} ) | 83.8 | 56.2 | 44.4 | 90.6 | 31.6 | 63.9 | 61.8
+Qwen3-1.7B-Base
+\beta_{0}=1.2 (linear) | 59.6 | 12.1 | 8.1 | 45.6 | 20.2 | 29.4 | 29.2
+\beta_{0}=1.2 (cosine) | 58.6 | 10.8 | 8.3 | 42.5 | 19.8 | 29.7 | 28.3
+\beta_{0}=1.3 (linear) | 61.0 | 11.7 | 8.3 | 46.9 | 19.1 | 29.4 | 29.4
+\beta_{0}=1.5 (linear) | 59.2 | 11.0 | 6.9 | 45.6 | 19.5 | 28.6 | 28.5
+
+TABLE A3.T5.6
+Model | Variant | MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg.
+Qwen3-8B | Rollout reuse | 84.8 | 56.9 | 46.7 | 91.6 | 32.5 | 62.4 | 62.5
+Resample | 83.7 | 58.5 | 47.9 | 90.6 | 31.3 | 63.1 | 62.5
+Qwen3-1.7B -Base | Rollout reuse | 59.6 | 12.1 | 8.1 | 45.6 | 20.2 | 29.4 | 29.2
+Resample | 59.6 | 11.9 | 7.5 | 43.8 | 18.8 | 29.0 | 28.4
+
+TABLE A3.T6.6
+Configuration | MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg.
+Qwen3-1.7B — Logit-space
+\eta=1.0 | 77.4 | 29.4 | 26.0 | 71.3 | 24.8 | 48.6 | 46.2
+\eta=0.95 | 75.4 | 32.7 | 29.8 | 73.1 | 25.0 | 50.2 | 47.7
+\eta=0.3 | 74.6 | 33.3 | 29.4 | 76.9 | 25.5 | 50.6 | 48.4
+\eta=0.1 | 75.2 | 36.3 | 33.3 | 78.8 | 24.9 | 52.9 | 50.2
+Qwen3-1.7B — Weight-space
+\eta=1.0 | 75.8 | 31.3 | 29.2 | 67.5 | 24.5 | 50.0 | 46.4
+\eta=0.3 | 76.3 | 31.3 | 29.0 | 73.1 | 24.8 | 52.5 | 47.8
+\eta=0.1 | 77.3 | 32.9 | 31.3 | 75.0 | 25.7 | 53.3 | 49.2
+OLMo3-7B-Instruct-SFT — Logit-space
+\eta=1.0 | 82.9 | 46.9 | 36.0 | 83.1 | 27.6 | 61.9 | 56.4
+\eta=0.1 | 78.4 | 31.3 | 32.3 | 76.9 | 25.4 | 56.2 | 50.1
+OLMo3-7B-Instruct-SFT — Weight-space
+\eta=1.0 | 82.8 | 42.5 | 32.5 | 76.9 | 27.8 | 59.6 | 53.7
+\eta=0.1 | 80.6 | 35.0 | 31.0 | 75.0 | 26.6 | 57.9 | 51.0
+
+TABLE A3.T7.6
+Model | Method | MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg.
+Qwen3-8B | GRPO | 83.8 | 54.4 | 42.9 | 89.4 | 31.5 | 57.9 | 60.0
+GRPO-2 \times | 84.5 | 53.5 | 42.3 | 92.5 | 31.4 | 58.9 | 60.5
+RISE (logit) | 84.8 | 56.9 | 46.7 | 91.6 | 32.5 | 62.4 | 62.5
+RISE (weight) | 84.4 | 58.1 | 45.8 | 91.9 | 32.6 | 63.3 | 62.7
+Qwen3-1.7B | GRPO | 75.6 | 30.0 | 26.3 | 65.6 | 23.9 | 51.1 | 45.4
+GRPO-2 \times | 74.5 | 32.9 | 30.6 | 70.6 | 25.6 | 49.7 | 47.3
+RISE (logit) | 75.2 | 36.3 | 33.3 | 78.8 | 24.9 | 52.9 | 50.2
+RISE (weight) | 77.3 | 32.9 | 31.3 | 75.0 | 25.7 | 53.3 | 49.2
+
+TABLE A3.T8.7
+Method | In-Domain Math | OOD
+MATH500 | AIME24 | AIME25 | AMC23 | Minerva | OlyBench | Avg. | GPQA | IFEval | MMLU | Avg.
+Qwen3-8B (DAPOMath)
+GRPO | 84.0 ±0.5 | 53.1 ±1.2 | 42.5 ±0.3 | 88.5 ±2.1 | 31.4 ±0.4 | 61.3 ±2.7 | 60.1 ±0.2 | 56.3 ±0.5 | 82.2 ±0.5 | 71.6 ±1.2 | 70.0 ±0.4
+SDAR | 84.7 ±0.4 | 48.9 ±1.0 | 39.1 ±1.2 | 90.0 ±1.3 | 30.6 ±0.6 | 64.2 ±0.7 | 59.6 ±0.6 | 55.3 ±0.3 | 83.2 ±0.6 | 71.4 ±1.5 | 69.9 ±0.6
+RISE (weight) | 84.9 ±0.5 | 55.8 ±1.7 | 44.1 ±1.2 | 92.8 ±0.6 | 32.3 ±0.2 | 64.4 ±0.9 | 62.4 ±0.2 | 58.1 ±0.7 | 84.1 ±0.5 | 72.3 ±1.0 | 71.5 ±0.4
+Qwen3-1.7B (DAPOMath)
+GRPO | 75.4 ±0.1 | 28.2 ±1.3 | 26.2 ±0.3 | 66.5 ±1.6 | 24.1 ±0.5 | 50.4 ±0.6 | 45.1 ±0.4 | 31.2 ±0.8 | 68.7 ±0.2 | 54.4 ±0.7 | 51.4 ±0.1
+RISE (logit) | 75.3 ±0.2 | 34.5 ±1.5 | 31.7 ±1.5 | 78.8 ±2.0 | 25.0 ±0.1 | 52.4 ±0.7 | 49.6 ±0.4 | 34.3 ±0.5 | 69.1 ±1.0 | 55.5 ±1.5 | 53.0 ±0.7
+RISE (weight) | 76.5 ±0.6 | 32.3 ±0.8 | 30.2 ±0.8 | 74.8 ±0.5 | 25.1 ±0.5 | 51.7 ±1.3 | 48.4 ±0.6 | 35.9 ±1.1 | 68.7 ±1.4 | 55.3 ±1.5 | 53.3 ±1.0

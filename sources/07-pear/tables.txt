@@ -1,0 +1,190 @@
+[TABLE S2.T1.3]
+Name | Per-token objective / weight
+SFT (NLL) | $\ell(p)=-\log p$
+SFT+KL | $\ell(p)=-\log p\;+\;\beta\,\mathrm{KL}$
+GeneralFamily- $\alpha$ | $\ell_{\alpha}(p)=\displaystyle\frac{1-p^{\alpha}}{\alpha}\;\;(\alpha\!\to\!0\Rightarrow-\log p)$
+TopP- $q$ | $(1-p)\,\mathbf{1}[p\geq q]$
+BottomP- $q$ | $(1-p)\,\mathbf{1}[p\leq q]$
+TopLogP- $q$ | $-\log(p)\,\mathbf{1}[p\geq q]$
+BottomLogP- $q$ | $-\log(p)\,\mathbf{1}[p\leq q]$
+TALR | $w_{t}\propto\exp(-\ell_{t}/\tau)=p_{t}^{1/\tau}$
+SFT+KL | $-\log(p)+\beta\mathrm{D_{KL}}$
+
+[TABLE S3.Ex1]
+ | $\mathcal{L}_{\text{PEAR }}(\theta)\;\triangleq\;\mathbb{E}_{(x,\mathbf{y})\sim\mathcal{D}}\!\left[\sum_{t=1}^{T}\mathop{\mathrm{sg}}\!\left[\widehat{G}_{t}\right]\ell_{\theta}(x,\mathbf{y}_{<t},y_{t})\right],$ | 
+
+[TABLE S3.Ex2]
+ | $\mathcal{L}_{\text{neg}}(\theta)\triangleq\mathbb{E}_{(x,\mathbf{y}^{-})\sim\mathcal{D}^{-}}\!\left[-\lambda\,\mathop{\mathrm{sg}}\!\left[\widehat{G_{t}^{-}}\right]\sum_{t=1}^{T}\ell_{\theta}(x,\mathbf{y}^{-}_{<t},y^{-}_{t})\right],$ | 
+
+[TABLE S4.T2.3]
+Base Model | Qwen2.5-1.5B-Math | DS-Qwen-1.5B | Qwen3-4B-Base | Qwen3-8B-Base
+Benchmark | Pass@ | SFT [-0.2ex] +GRPO | PEAR B=1 [-0.2ex] +GRPO | SFT [-0.2ex] +GRPO | PEAR B=1 [-0.2ex] +GRPO | SFT [-0.2ex] +GRPO | PEAR B=1 [-0.2ex] +GRPO | SFT [-0.2ex] +GRPO | PEAR B=1 [-0.2ex] +GRPO
+AIME24 | Avg. 64 | 5% | 8% (+3) | 1% | 14% (+13) | 13% | 15% (+2) | 15% | 19% (+4)
+8 | 19% | 23% (+4) | 2% | 38% (+36) | 25% | 40% (+15) | 35% | 41% (+6)
+64 | 37% | 47% (+10) | 7% | 57% (+50) | 43% | 60% (+17) | 60% | 67% (+7)
+AIME25 | Avg. 64 | 3% | 8% (+5) | 1% | 14% (+13) | 7% | 15% (+8) | 17% | 18% (+1)
+8 | 14% | 24% (+10) | 5% | 35% (+30) | 21% | 35% (+14) | 35% | 35% (0)
+64 | 30% | 40% (+10) | 17% | 53% (+36) | 40% | 57% (+17) | 53% | 53% (0)
+AMC23 | Avg. 64 | 42% | 47% (+5) | 20% | 56% (+36) | 54% | 59% (+5) | 45% | 55% (+10)
+8 | 80% | 78% (-2) | 50% | 91% (+41) | 83% | 88% (+5) | 75% | 85% (+10)
+64 | 98% | 98% (0) | 63% | 98% (+35) | 93% | 95% (+2) | 95% | 98% (+3)
+Olympiad | Avg. 64 | 29% | 34% (+5) | 13% | 41% (+28) | 41% | 46% (+5) | 32% | 40% (+8)
+8 | 55% | 57% (+2) | 34% | 66% (+32) | 60% | 66% (+6) | 60% | 65% (+5)
+MATH500 | Avg. 64 | 63% | 70% (+7) | 36% | 72% (+36) | 78% | 80% (+2) | 66% | 74% (+8)
+8 | 89% | 91% (+2) | 68% | 94% (+26) | 93% | 93% (0) | 90% | 93% (+3)
+Pass@1 Avg. | 28% | 33% (+5) | 14% | 39% (+25) | 39% | 43% (+4) | 35% | 41% (+6)
+Pass@8 Avg. | 51% | 55% (+4) | 32% | 65% (+33) | 56% | 65% (+9) | 59% | 64% (+5)
+
+[TABLE S4.T3.3]
+Qwen3-Base | 0.6B | 1.7B | 4B | 8B
+SFT [-0.2ex] +GRPO | 9% [-0.25ex] (+0) | 23% [-0.25ex] (+0) | 39% [-0.25ex] (+0) | 36% [-0.25ex] (+0)
+Single Step [-0.2ex] +GRPO | 10% [-0.25ex] (+1) | 18% [-0.25ex] (-5) | 38% [-0.25ex] (-1) | 30% [-0.25ex] (-6)
+PEAR B=1 [-0.2ex] +GRPO | 12% [-0.25ex] (+3) | 26% [-0.25ex] (+3) | 44% [-0.25ex] (+5) | 41% [-0.25ex] (+5)
+
+[TABLE S4.Ex3]
+ | $\mathcal{L}(\theta)\;=\;\mathbb{E}_{(x,y,R)\sim\mathcal{D}}\left[\sum_{t=1}^{T}{\color[rgb]{0.75,0,0.25}\mathbf{w(x,y_{<t},y_{t})}}\ell_{\theta}(x,y_{<t},y_{t})\right],$ | 
+
+[TABLE S4.T4.3]
+ | Direct [-0.2ex] +GRPO | SFT [-0.2ex] +GRPO | PEAR B=1 [-0.2ex] +GRPO
+Qwen3-0.6B-Base | 2.8% | 8.4% | 13.1% (+4.7)
+Qwen3-1.7B-Base | 2.8% | 13.1% | 38.3% (+25.2)
+Qwen3-4B-Base | 8.0% | 49.5% | 59.8% (+10.3)
+Qwen3-8B-Base | 15.0% | 53.3% | 61.7% (+8.4)
+
+[TABLE Ax1.p1.1]
+A | Black-Box PEAR: Proxy and Ensemble Behavior Policies . | A
+B | Hyperparameter Sensitivity: Clipping Range . | B
+C | Block-Size Ablation . | C
+D | Beyond Reasoning: Instruction-Following . | D
+E | Comparison with CHORD . | E
+F | Does PEAR Suppress Useful Low-Probability Trajectories? . | F
+G | Compatibility with Other RL Algorithms (DAPO) . | G
+H | Computation of Metrics . | H
+I | Suffix Change-of-Measure . | I
+J | An Alternative Intuition: Suffix Ratios as Off-Policy Value Estimates . | J
+K | Details on Baselines (TALR, Beyond Log-Likelihood) . | K
+L | Discussion: Should Offline Training Match Online RL Characteristics? . | L
+M | Offline vs Online Metrics: Detailed Tables . | M
+
+[TABLE A1.T5.3]
+Proxy | Pearson w.r.t. behavior
+Qwen3-32B | 0.7328
+Qwen3-4B | 0.7237
+Ensemble (Mixture) | 0.7263
+Qwen3-4B-Thinking | 0.6605
+
+[TABLE A2.T6.3]
+Clip range | Pass@32 / Pass@64
+$[-0.08,\,0.08]$ | 42.50 / 48.75
+$[-0.08,\,0.30]$ | 46.25 / 52.50
+$[-0.30,\,0.08]$ | 50.00 / 52.50
+$[-0.30,\,0.30]$ | 51.25 / 55.00
+
+[TABLE A3.T7.3]
+Setting | Pass@1 | Pass@8
+Sequence | 57.50 | 67.50
+Block-4 | 60.00 | 83.75
+Block-8 | 68.75 | 77.50
+Block-1 (token) | 45.00 | 70.00
+
+[TABLE A4.T8.3]
+ | SFT + GRPO | PEAR + GRPO
+IF-Eval (Qwen3-0.6B-Base) | 37.34% | 57.67%
+IF-Bench (Qwen3-0.6B-Base) | 16.67% | 29.59%
+
+[TABLE A5.T9.3]
+Method | Pass@1 | Pass@8
+SFT | 10.00% | 40.00%
+CHORD | 11.40% | 31.25%
+PEAR | 12.50% | 42.50%
+
+[TABLE A6.T10.3]
+Method | wait | hmm | alternatively | okay | therefore
+SFT | 1691 | 76 | 234 | 176 | 300
+PEAR | 1540 | 74 | 267 | 158 | 244
+
+[TABLE A8.EGx1]
+ | $\displaystyle\text{Forward KL}=\text{KL}(P_{\text{base}}||P_{\text{trained}})=\Sigma P_{\text{base}}\log{(P_{\text{base}}/P_{\text{trained}})}$ | 
+
+[TABLE A8.EGx2]
+ | $\displaystyle\Delta W$ | $\displaystyle=W_{\text{trained}}-W_{\text{base}},$ | 
+ | $\displaystyle\mathrm{sparsity}(W)$ | $\displaystyle=\frac{1}{|\Delta W|}\sum_{i,j}\mathbf{1}\!\left(|\Delta W_{ij}|<\epsilon\right),$ | 
+
+[TABLE A8.EGx3]
+ | $\displaystyle\text{NSS}(W)=\|\sigma(W_{+})-\sigma(W_{0})\|_{2}/\|\sigma(W_{0})\|_{2}$ | 
+
+[TABLE A8.EGx4]
+ | $\displaystyle\cos_{\theta_{i}}(U):=\sigma_{i}(U_{\text{offline},k}\top U_{\text{online},k}),i=1,\dots,k$ | 
+
+[TABLE A9.Ex9]
+ | $\pi(y_{t:T}\mid s_{t})=\prod_{k=t}^{T}\pi(y_{k}\mid x,y_{<k}).$ | 
+
+[TABLE A9.Ex10]
+ | $\rho_{t:T}(x,y)\;\coloneqq\;\frac{\pi_{\theta}(y_{t:T}\mid s_{t})}{\pi_{\beta}(y_{t:T}\mid s_{t})}=\prod_{k=t}^{T}\frac{\pi_{\theta}(y_{k}\mid x,y_{<k})}{\pi_{\beta}(y_{k}\mid x,y_{<k})}.$ | 
+
+[TABLE A9.EGx5]
+ | $\displaystyle\mathbb{E}_{y_{t:T}\sim\pi_{\theta}(\cdot\mid s_{t})}\!\big[\varphi(s_{t},y_{t:T})\big]$ | $\displaystyle=\sum_{y_{t:T}}\pi_{\theta}(y_{t:T}\mid s_{t})\,\varphi(s_{t},y_{t:T})$ | 
+ |  | $\displaystyle=\sum_{y_{t:T}}\pi_{\beta}(y_{t:T}\mid s_{t})\,\frac{\pi_{\theta}(y_{t:T}\mid s_{t})}{\pi_{\beta}(y_{t:T}\mid s_{t})}\,\varphi(s_{t},y_{t:T})$ | 
+ |  | $\displaystyle=\mathbb{E}_{y_{t:T}\sim\pi_{\beta}(\cdot\mid s_{t})}\!\big[\rho_{t:T}(x,y)\,\varphi(s_{t},y_{t:T})\big],$ | 
+
+[TABLE A10.EGx6]
+ | $\displaystyle Q^{\pi_{\theta}}_{\gamma}(s_{t},a_{t})\;\triangleq\;\mathbb{E}_{a_{t+1:T}\sim\pi_{\theta}(\cdot\mid s_{t+1:T})}\!\left[\gamma^{\,T-t}\,R(\tau)\;\middle|\;s_{t},a_{t}\right],$ |  | (1)
+
+[TABLE A10.EGx7]
+ | $\displaystyle Q^{\pi_{\theta}}_{\gamma}(s_{t},a_{t})$ | $\displaystyle=\sum_{a_{t+1:T}}\pi_{\theta}(a_{t+1:T}\mid s_{t},a_{t})\;\gamma^{T-t}R(\tau)$ | 
+ |  | $\displaystyle=\sum_{a_{t+1:T}}\pi_{\beta}(a_{t+1:T}\mid s_{t},a_{t})\;\underbrace{\frac{\pi_{\theta}(a_{t+1:T}\mid s_{t},a_{t})}{\pi_{\beta}(a_{t+1:T}\mid s_{t},a_{t})}}_{w_{t+1:T}(\tau)}\;\gamma^{T-t}R(\tau)$ | 
+ |  | $\displaystyle=\mathbb{E}_{\tau\sim\pi_{\beta}}\!\left[\gamma^{\,T-t}\,R(\tau)\,w_{t+1:T}(\tau)\;\middle|\;s_{t},a_{t}\right],$ |  | (2)
+
+[TABLE A10.Ex16]
+ | $w_{t+1:T}(\tau)\;\triangleq\;\prod_{j=t+1}^{T}\frac{\pi_{\theta}(a_{j}\mid s_{j})}{\pi_{\beta}(a_{j}\mid s_{j})}.$ | 
+
+[TABLE A10.EGx8]
+ | $\displaystyle G_{t}(\tau)\;\triangleq\;\gamma^{\,T-t}R(\tau)\,w_{t+1:T}(\tau),\qquad\text{so that}\quad G_{t}(\tau)\approx Q^{\pi_{\theta}}_{\gamma}(s_{t},a_{t}).$ |  | (3)
+
+[TABLE A11.Ex17]
+ | $\ell_{t}=-\log p_{t}.$ | 
+
+[TABLE A11.Ex18]
+ | $\tilde{w}_{t}=\exp\!\left(-\frac{\ell_{t}}{\tau}\right),\qquad w_{t}=\max\!\big(\mathrm{sg}(\tilde{w}_{t}),\,w_{\min}\big),$ | 
+
+[TABLE A11.Ex19]
+ | $\mathcal{L}_{\textsc{talr}}=\frac{1}{N}\sum_{t=1}^{N}w_{t}\,(-\log p_{t}),$ | 
+
+[TABLE A11.T11.3]
+Key | Name | Per-token loss $f(p)$ | Hyperparameters / mask
+original | NLL (standard SFT) | $-\log p$ | None
+GeneralFamily- $\alpha$ | Probability family | $\displaystyle\frac{1-p^{\alpha}}{\alpha}$ | $\alpha$ (with $\alpha\to 0$ recovering $-\log p$ )
+p | Plain- $p$ objective | $1-p$ | None (equiv. to GeneralFamily-1 up to constants)
+OnlyTopP- $q$ | Top-thresholded (plain- $p$ ) | $(1-p)\,\mathbf{1}[p\geq q]$ | $q\in[0,1]$
+OnlyBottomP- $q$ | Bottom-thresholded (plain- $p$ ) | $(1-p)\,\mathbf{1}[p\leq q]$ | $q\in[0,1]$
+OnlyTopLogP- $q$ | Top-thresholded (NLL) | $-\log(p)\,\mathbf{1}[p\geq q]$ | $q\in[0,1]$
+OnlyBottomLogP- $q$ | Bottom-thresholded (NLL) | $-\log(p)\,\mathbf{1}[p\leq q]$ | $q\in[0,1]$
+Paper-only (used for analysis/ablations; not exposed as repo keys)
+
+[TABLE A13.T12.3]
+Objective | Offline | Online
+Pass@1 | Pass@8 | Pass@128 | maj vote | Pass@1 | Pass@8
+PEAR | 32.50% | 37.50% | 31.25% | 1.25% | 22.50% | 56.25%
+PEAR | 20.00% | 23.75% | 32.50% | 1.25% | 45.00% | 70.00%
+SFT | 22.50% | 27.50% | 20.00% | 0.00% | 30.00% | 57.50%
+SFT TALR | 8.75% | 35.00% | 55.00% | 6.25% | 13.75% | 48.75%
+SFT-KL( $\beta=0.03$ ) | 10.00% | 35.00% | - | - | 42.75% | 67.50%
+SFT-KL( $\beta=0.3$ ) | 5.00% | 40.00% | - | - | 22.50% | 40.00%
+SFT-KL( $\beta=1.0$ ) | 5.00% | 28.75% | - | - | 8.75% | 13.75%
+TopP | 13.75% | 33.75% | 56.25% | 21.25% | 18.75% | 37.50%
+TopLogP | 20.00% | 37.50% | 56.25% | 18.75% | 10.00% | 37.50%
+BottomP | 3.75% | 30.00% | 56.25% | 13.75% | 16.25% | 55.00%
+BottomLogP | 10.00% | 28.75% | 47.50% | 1.25% | 10.00% | 37.50%
+$(1-p)^{\alpha}/\alpha$ | 8.75% | 27.50% | 60.00% | 17.50% | 21.25% | 48.75%
+
+[TABLE A13.T13.3]
+Objective | Offline | Online
+Pass@1 | Pass@8 | Pass@1 | Pass@8
+PEAR | 32.50% | 37.50% | 63.75% | 76.25%
+SFT | 10.00% | 26.25% | 42.50% | 71.25%
+SFT TALR | 13.75% | 45.00% | 36.40% | 68.80%
+TopP | 37.50% | 45.00% | 42.50% | 63.75%
+TopLogP | 33.75% | 52.50% | 58.76% | 72.50%
+BottomP | 32.50% | 60.00% | 38.75% | 71.25%
+BottomLogP | 10.00% | 16.25% | 26.25% | 42.50%
+$(1-p)^{\alpha}/\alpha$ | 32.50% | 47.50% | 33.75% | 63.75%

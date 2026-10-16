@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>SOAR · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">02 / 11 · 教学与成本</p>
+<h1>SOAR：老师先出题，学生练完真有进步，老师才得到奖励</h1>
+<p class="original">Teaching Models to Teach Themselves: Reasoning at the Edge of Learnability</p>
+<div class="meta"><span>Sundaram, Quan, Kwiatkowski et al.</span><a href="https://proceedings.mlr.press/v306/sundaram26a.html">ICML 2026 ↗</a><span>2026-06-30 · 2601.18778v3</span><a href="https://arxiv.org/abs/2601.18778v3">论文 ↗</a><a href="原文PDF/02-soar--2601.18778v3.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="soar" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">老师生成一小组题和答案，学生在这些题上真实训练十步。再去原来的难题上测成绩，进步多少就给老师多少奖励，让老师逐渐学会出有帮助的题。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>学生不会难题，先让老师试着出几道辅助题</h2><p>假设学生一直不会一批复杂数学题。老师生成一组较简单的练习，学生练十步后，再回到原来的难题上测试。如果准确率从百分之一变成百分之三，这组练习就带来了两个百分点的进步。</p><p>SOAR 用的就是这种进步反馈。老师出题时不直接看那些用于打分的难题，只从“学生练完以后有没有进步”中学习。这里的数字是说明算法的例子。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>老师模型</td><td>生成题目和答案，并根据教学后的学生进步更新。</td></tr><tr><td>学生模型</td><td>在老师题集上做真实 RL；主实验与老师从同一个基模复制。</td></tr><tr><td>原始难题</td><td>提供外层成绩检查；训练奖励题和最终测试题分开。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;老师生成题目与答案&quot;] --&gt; B[&quot;学生真实训练 10 步&quot;] --&gt; C[&quot;原始难题上测进步&quot;] --&gt; D[&quot;RLOO 更新老师&quot;]
+ D -. 下轮出题 .-&gt; A
+ C -. 达阈值则晋升 .-&gt; E[&quot;新的学生基线&quot;]</pre></figure><section class="method-block"><h3>1. 先选出学生目前基本做不对的题</h3><p>作者先对每道数学题采样一百二十八次，保留这次检查中一次也没答对的题，称为 fail@128。再将这些题分成训练和测试部分。直接在这样的训练集上做结果奖励 RL，容易因为几乎没有正确回答而停滞。</p><p>fail@128 是一个有限次采样的筛选条件，不表示真实成功概率严格等于零。换一个随机种子仍可能偶尔答对。最终表里基模有小幅非零成绩，并不与这个筛选方式矛盾。</p></section><section class="method-block"><h3>2. 老师生成多组候选练习题</h3><p>老师和学生最初来自同一个模型。每一轮老师生成多份小题集，每道题同时给出答案。输出必须符合约定格式，例如包含题目、答案标签和可解析的 boxed answer；格式不对就重新采样。</p><p>这个检查不保证数学答案一定正确。老师提出的是一组待尝试的教学材料，是否有帮助，要真的让学生练过才知道。最终奖励按整组题分配，组内各条生成都得到这组的奖励，而不是分别得到精确的逐题或逐 token 贡献分数。</p></section><section class="method-block"><h3>3. 让学生分别在各组题上训练十步</h3><p>每个候选题集都从同一个学生基线开始，使用 RLOO 做十步 RL，batch size 为八。学生对合成题作答，以老师提供的答案作为结果比较依据。这个内层会真实生成回答、计算奖励和更新参数，不是只估计一次梯度。</p><p>不同候选题集分别得到训练后的学生。因为它们出发点相同，之后比较进步才比较公平。通常试完一组就恢复基线，不会让第二组题顺便继承第一组已经训练的效果。</p></section><section class="method-block"><h3>4. 回到真实难题，给老师这组题打分</h3><p>从原始困难训练集抽一批奖励题，让训练后的学生和训练前基线都作答。计算 greedy 准确率差：训练后减训练前。差值为正说明这组练习对当前难题有帮助，为负说明它可能把学生教差了。</p><p>这个差值经过重复学生训练和平均来减少噪声，再用于 RLOO 更新老师。算法把学生十步训练当成一个可以试验、可以评分的过程，不需要穿过十步更新反向传播。最终测试集不参与给老师发奖励。</p><div class="equation" id="equations"><h4>老师到底因为什么拿到奖励</h4><div class="math">$$\begin{aligned}R(X_k)={}&amp;\operatorname{Acc}(\theta&#x27;_k,Q_R)\\&amp;-\operatorname{Acc}(\theta,Q_R)\end{aligned}$$</div><p>Xₖ 是一组老师练习，θ 是学生基线，θ′ₖ 是练完后的学生。两者在同一批真实难题 Qᵣ 上比较，差值作为这组题的教学奖励。</p></div></section><section class="method-block"><h3>5. 学生持续有进步时，再提高教学难度</h3><p>如果每轮都恢复最初的弱学生，老师可能永远只会教最初那一点内容。SOAR 因此设置 promotion：当教师奖励的三步移动平均超过阈值 0.01，保留在最佳题集上训练出的学生，作为后续的新基线。</p><p>以后所有题集都要证明，能让这个更强的学生继续进步。导致晋升的那些题也被保存下来，叫 Promotion Questions。它处理学生变强的方法很具体：更新共同起点，并继续奖励相对于新起点的增量。</p></section><p class="source-line"><a href="https://arxiv.org/html/2601.18778v3#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>PS、PQ、Grounded-T 分别测什么？</h3><p>PS 直接测晋升得到的学生；PQ 拿保存的好题，和真实难题一起重新训练一个新学生；Grounded-T 则从训练好的老师重新采题，再检查这些新题是否有用。这样分开看，是为了避免把一次幸运的学生训练误当成老师已经学会出题。</p></section><section class="practical-detail"><h3>为什么老师答案有错，也可能产生进步？</h3><p>内层的合成答案未必正确，但外层拿真实难题检查最终效果。论文观察到题目结构清楚、内容有用也很重要。这个结果不表示错误标注普遍有益；它只说明在这套实验里，教学材料的价值不能仅用答案正确率解释。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">MATH fail@128 测试</th><th scope="col">Pass@1</th><th scope="col">Pass@32</th></tr></thead><tbody><tr><td>直接难题 RL</td><td>0.5 ± 0.1</td><td>9.6 ± 2.6</td></tr><tr><td>Intrinsic-T 题目</td><td>1.0 ± 0.6</td><td>14.1 ± 7.5</td></tr><tr><td>SOAR-PQ 题目</td><td>1.7 ± 1.0</td><td>18.9 ± 5.3</td></tr><tr><td>SOAR-PS 学生</td><td>1.0 ± 0.2</td><td>18.1 ± 2.4</td></tr></tbody></table></div><p class="note">arXiv v3 Appendix Table 4，均为百分比、跨种子均值 ± 标准差。PQ 是取合成题重新训练的学生，PS 是晋升得到的学生，不能混作同一种评估。 <a href="https://arxiv.org/html/2601.18778v3">原文表格 ↗</a></p><p>在 MATH fail@128 测试中，PQ 学生的 Pass@32 为 18.9，直接难题 RL 为 9.6。PQ 重新训练仍有提升，说明收益并不只来自晋升学生碰巧走过的一条训练过程，保存的题本身也有帮助。</p><p>只按题目“难度适中”给老师奖励的 Intrinsic-T，平均效果和跨种子稳定性较差。与此同时，SOAR 的成本也更高：每轮老师采题后，要运行多组学生训练、重复和评价。比较其他元教学方法时，应把这整套费用计算进去。</p><p class="source-line"><a href="https://arxiv.org/html/2601.18778v3#A3">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>SOAR 已经用真实学生进步训练老师。若你的方法改为学习 OPD 的内容或强度，再评价老师退出后的独立 RL，就应明确比较：教的是题还是 token，学生怎样更新，哪一段训练后的成绩决定老师奖励。</p><details class="project-more"><summary>实验对照建议</summary><p>SOAR 已使用真实学生进步训练教师，并通过 promotion 处理学生变强。区别必须落到出题与 OPD 教学动作、内层损失、独立 RL 评价时域及计算预算。</p></details></section>
+<p class="endnote">SOAR 让老师反复试题集：出题、让学生真练、测难题进步，再据此改进出题模型。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2601.18778v3#S3">双层目标与晋升 ↗</a><a href="https://arxiv.org/html/2601.18778v3#S4">训练与评估协议 ↗</a><a href="https://arxiv.org/html/2601.18778v3#A3">完整结果 ↗</a><a href="sources/02-soar/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="01-rise.html"><small>上一篇</small>RISE</a><a href="03-near-future.html"><small>下一篇</small>NPO / NPD / AutoNPO</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

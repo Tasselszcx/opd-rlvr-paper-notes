@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>MetaOPD · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">06 / 11 · 监督分配</p>
+<h1>MetaOPD：先试一次更新，再学怎样给 token 分权重</h1>
+<p class="original">MetaOPD: Meta-Learned Token Weighting for On-Policy Distillation</p>
+<div class="meta"><span>Wang, Dong, Wang et al.</span><span>2026-10-08 · 2610.11989v1</span><a href="https://arxiv.org/abs/2610.11989v1">论文 ↗</a><a href="原文PDF/06-metaopd--2610.11989v1.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="metaopd" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">一个小网络给学生回答中的 token 分配训练权重。先按这些权重试着更新学生，再用参考解答检查这次更新有没有帮助；检查结果用来改小网络，随后才真正更新学生。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>先试权重，再决定这一步怎么学</h2><p>假设一条回答有两个值得纠正的位置，小网络起初都给权重一。按这组权重试着更新学生后，用另外一批参考解答计算预测损失。这个损失会告诉网络：把更新量更多放到哪个位置，可能让这一步学得更好。</p><p>这里“试着更新”会产生一份临时学生参数，不会直接覆盖真实学生。小网络改好权重后，才从原来的学生参数和优化器状态出发，做真正的一次更新。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>学生</td><td>生成回答，并接受最终的加权 OPD 更新。</td></tr><tr><td>固定老师</td><td>在学生回答的位置给 token 概率。</td></tr><tr><td>权重网络</td><td>根据师生预测特征给 token 权重；由参考解答损失训练。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;token 特征&quot;] --&gt; B[&quot;权重网络&quot;] --&gt; C[&quot;虚拟学生更新&quot;] --&gt; D[&quot;参考解答 loss&quot;]
+ D -. 训练权重网络 .-&gt; B
+ B --&gt; E[&quot;重算权重并真实更新&quot;]</pre></figure><section class="method-block"><h3>1. 先收集普通 OPD 所需的回答和老师评分</h3><p>学生对训练题生成回答，老师对相同前缀给出概率。保留采样时的学生概率、老师概率以及哪些位置是真实输出 token。它们用于构造普通 OPD 的逐 token 更新信号，也供后面的小网络判断这些位置的状态。</p><p>这时还没有更新学生。参考解答也不直接作为这条学生回答的正确续写插进去。这里仍然是学生自己生成，老师在学生自己的文字上给监督。</p></section><section class="method-block"><h3>2. 把每个位置变成一组数字，交给权重网络</h3><p>输入特征一共七十四维，包括师生给当前 token 的概率及差值、两边的熵、最可能 token 是否相同、位置，以及各自 top-32 的概率列表。它们描述这个位置的预测情况，网络并不直接读取一段完整参考答案来决定权重。</p><p>这些输入数字会 detach，也就是从学生的反向传播计算里断开。网络输出分数后，再把它变成正权重，并让每条回答的平均权重等于一。这样主要改变的是位置之间的训练分配，不是把整条回答的损失都随意放大。</p><div class="equation" id="equations"><h4>权重乘在原 OPD 损失上</h4><div class="math">$$L_{in}=\frac1N\sum_t w_\eta(f_t)\ell_t^{OPD}(\theta)$$</div><p>fₜ 是该位置的特征，wη 是小网络给的权重，ℓOPD 是原来的 token 损失。全给一时，就是均匀加权的 OPD。</p></div></section><section class="method-block"><h3>3. 模拟一次真实会发生的 AdamW 更新</h3><p>按当前权重计算学生梯度，再模拟一次 AdamW 更新，得到临时参数 θ′。模拟会使用当前真实优化器的动量、二阶矩、学习率和梯度裁剪，而不是只写成一个粗略的减梯度操作。因为这些状态会影响同一份梯度最终把参数推到哪里。</p><p>真实学生参数、真实优化器状态和步数都暂时不变。这份临时学生只用来评价刚才的权重。网络不需要穷举所有权重组合，而是保留“权重怎样影响这次更新”的可微关系，随后用梯度计算怎样改它。</p></section><section class="method-block"><h3>4. 用参考解答检查临时学生，并更新小网络</h3><p>拿一批题目和参考解答，让临时学生沿参考解答的前缀预测下一 token，计算负对数似然，也就是 NLL。若这次更新让参考 token 更容易被预测到，NLL 会更低。梯度穿过临时更新，告诉权重网络怎样分配更有利。</p><p>论文把它叫 validation loss，但这批参考解答来自训练集的另一个打乱数据流，不是测试集，两条训练流也允许题目重叠。另有一个正则项，让权重别在证据不足时离均匀分配太远。完成这一步后，改变的是小网络参数。</p></section><section class="method-block"><h3>5. 丢掉临时学生，用新权重真正更新</h3><p>用改好的小网络对同一批特征重新计算权重。然后丢弃 θ′，从原始学生参数和原始优化器状态出发，做真实的加权 OPD 更新。真实更新时把权重当常数，不再顺便训练小网络。</p><p>不能直接在临时 θ′ 上继续走，否则学生实际经历了两次更新，和刚才评价的操作不同。下一批再重复同样流程。计算上用 VJP、JVP 避免保存每个 token 的完整参数梯度，但临时更新和参考解答计算仍然需要大模型算力。</p></section><p class="source-line"><a href="https://arxiv.org/html/2610.11989v1#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>它是不是直接多做了一遍 SFT？</h3><p>参考解答的损失用来训练权重网络，真实学生目标仍是加权 OPD。这和直接把 SFT loss 加到学生目标上不同。但参考标注确实参与了训练，因此也不能宣称方法完全不需要参考解答。</p></section><section class="practical-detail"><h3>小网络为什么还会带来接近两倍成本？</h3><p>便宜的是权重网络本身。昂贵的是为评价它而做的临时学生更新、参考解答前向以及穿过更新求导。论文在 1.7B 设置下记录到 45.0 对 88.5 GPU-hours，比较时应使用这类整套训练成本。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">学生 / 指标</th><th scope="col">OPD</th><th scope="col">MetaOPD</th></tr></thead><tbody><tr><td>0.6B · Avg@8</td><td>15.97</td><td>17.96</td></tr><tr><td>0.6B · Pass@8</td><td>29.94</td><td>35.91</td></tr><tr><td>1.7B · Avg@8</td><td>25.07</td><td>27.32</td></tr><tr><td>1.7B · Pass@8</td><td>40.41</td><td>46.82</td></tr></tbody></table></div><p class="note">原文 Table 1，老师 Qwen3-8B，六项数学均分。Avg@8 是平均准确率；Pass@8 是八次至少一次答对。 <a href="https://arxiv.org/html/2610.11989v1">原文表格 ↗</a></p><p>表中的 Avg@8 是八次回答的平均准确率，Pass@8 是八次里至少答对一次的比例。后者增长更明显，表示学生能在多次尝试中找到正确答案的题更多，不能把两个指标当作同一种准确率。</p><p>作者做了只输入位置、熵或概率差的消融，也比较了直接加 SFT loss 的做法。完整特征平均效果更好，但并非每个 benchmark 都提高。这里评价的是一次虚拟更新后的参考预测能力，尚不能直接说明它已经找到长期 RL 回报最大的 token 权重。</p><p class="source-line"><a href="https://arxiv.org/html/2610.11989v1#A2">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>SOAR 会让学生真实训练多步，再用任务准确率奖励老师；MetaOPD 模拟一步，用参考解答损失更新权重网络。二者花的计算、用的反馈和教的东西都不同。</p><details class="project-more"><summary>实验对照建议</summary><p>一步虚拟更新后的参考 loss 已能训练权重网络。更长 RL 反馈应证明一步代理在哪些任务上排序错误，并与它约翻倍的实测训练成本一起比较。</p></details></section>
+<p class="endnote">先用一次临时更新教会小网络怎样分权重，再用改好的权重真正更新学生。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2610.11989v1#S3">网络与双层更新 ↗</a><a href="https://arxiv.org/html/2610.11989v1#S4">主要结果 ↗</a><a href="https://arxiv.org/html/2610.11989v1#A2">实现及实际成本 ↗</a><a href="sources/06-metaopd/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="05-opw.html"><small>上一篇</small>OPW</a><a href="07-pear.html"><small>下一篇</small>PEAR</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

@@ -1,0 +1,200 @@
+TABLE S4.T1.5
+Setting | Starting policy | Before RL | After RL | Change
+Text | Base | 36.48 | 51.90 | +15.42
+ | SFT | 37.75 | 47.48 | +9.73
+ | OPD | 37.02 | 59.18 | +22.16
+Vision-language | Base | 58.83 | 61.68 | +2.85
+ | SFT | 52.90 | 61.33 | +8.43
+ | OPD | 60.66 | 63.02 | +2.36
+
+TABLE S6.T2.5
+Distillation prefixes | Objective | Before RL | After RL | Change
+Student (OPD) | RKL | 60.66 | 63.02 | +2.36
+Student (OPD) | FKL | 60.17 | 64.87 | +4.70
+Teacher (TFD) | RKL | 57.09 | 61.90 | +4.82
+Teacher (TFD) | FKL | 56.12 | 59.20 | +3.08
+
+TABLE A1.T3.5
+Component | Text | Vision-language
+Student / teacher | Qwen3-8B / Qwen3-32B | Qwen3-VL-8B / Qwen3-VL-32B
+OPD prompts | OpenMathInstruct, 100K | OpenMMReasoner, 100K
+RL prompts | DAPO-Math, 17K | DeepMath, MMK12/VisionR1, 16K in total
+Evaluation | Eight benchmarks | Twenty benchmarks
+Diagnostic prompts | 1,024 from the RL pool | 1,024 from the RL pool
+
+TABLE A1.E1
+ | \mathcal{L}_{\mathrm{SFT}}=-\mathbb{E}_{(x,y^{T})}\frac{1}{|y^{T}|}\sum_{t}\log\pi_{\theta}(y_{t}^{T}\mid x,y^{T}_{<t}). |  | (1)
+
+TABLE A1.E2
+ | \mathcal{L}_{\mathrm{RKL}}(s)=D_{\mathrm{KL}}(p_{s}\|q_{s}),\qquad\mathcal{L}_{\mathrm{FKL}}(s)=D_{\mathrm{KL}}(q_{s}\|p_{s}). |  | (2)
+
+TABLE A1.T4.5.2
+Setting | Value
+Objective | RKL or FKL
+Training data size | 100K prompts
+Epochs | 1
+Global batch size | 1,024
+Micro-batch size | 1
+Learning rate | 10^{-5}
+Learning-rate schedule | Cosine; 5% warmup
+Minimum learning rate | 10^{-6}
+Maximum prompt / response tokens | 4,096 / 16,384
+Precision | bfloat16
+Seed | 42
+
+TABLE A1.T4.6.2
+Setting | Value
+Algorithm | GRPO
+Training data size | 16K prompts
+PPO epochs per update | 1
+Actor global batch size | 64
+Rollout batch size | 256 prompts
+Responses per prompt | 10
+Learning rate | 10^{-6}
+Maximum prompt / response tokens | 4,096 / 16,384
+Sampling temperature / top- p | 1.0 / 1.0
+Actor KL-loss coefficient | 0.01
+Seed | 1
+Validation / checkpoint interval | 5 / 10 steps
+
+TABLE A2.T5.5
+ | Base \rightarrow RL | SFT \rightarrow RL | OPD \rightarrow RL
+Benchmark | Before | After | Before | After | Before | After
+AIME25 | 19.90 | 45.83 | 25.00 | 39.69 | 20.31 | 51.67
+AIME24 | 24.90 | 47.40 | 25.62 | 39.27 | 24.17 | 57.71
+AIME26 | 14.27 | 47.92 | 21.98 | 41.15 | 16.56 | 53.96
+AMC23 | 66.56 | 86.25 | 64.84 | 81.72 | 67.73 | 91.02
+AMC24 | 44.44 | 58.40 | 44.44 | 55.90 | 44.44 | 65.28
+HMMT | 11.15 | 17.60 | 11.67 | 15.83 | 10.21 | 23.54
+MinervaMath | 55.88 | 58.82 | 56.99 | 56.99 | 57.72 | 64.34
+OlympiadBench | 54.75 | 52.97 | 51.48 | 49.26 | 55.04 | 65.88
+Average | 36.48 | 51.90 | 37.75 | 47.48 | 37.02 | 59.18
+
+TABLE A2.T6.6
+ | Base \rightarrow RL | SFT \rightarrow RL | OPD \rightarrow RL
+Benchmark | Before | After | Before | After | Before | After
+MMMU | 65.78 | 66.89 | 64.00 | 67.22 | 66.33 | 67.67
+MMMU-Pro | 52.20 | 53.27 | 49.97 | 54.45 | 52.08 | 54.71
+WeMath | 52.95 | 62.67 | 48.38 | 59.52 | 56.95 | 62.10
+Realworld-QA | 70.98 | 72.03 | 70.46 | 71.37 | 71.76 | 73.46
+MM-Star | 71.20 | 72.60 | 68.73 | 71.07 | 71.20 | 72.13
+SimpleVQA | 53.48 | 55.01 | 53.19 | 53.58 | 54.72 | 55.21
+MMIfeval | 60.99 | 63.40 | 60.82 | 61.28 | 61.76 | 63.55
+MMLongBench-Doc | 48.30 | 48.95 | 47.20 | 49.31 | 49.95 | 49.77
+AI2D | 85.07 | 84.46 | 83.68 | 84.82 | 84.39 | 85.62
+CharXiv-DQ | 87.42 | 87.35 | 87.15 | 88.05 | 88.45 | 89.05
+CharXiv-RQ | 46.30 | 48.00 | 45.40 | 47.00 | 47.20 | 49.20
+MMLU-Pro | 68.08 | 68.41 | 64.01 | 68.08 | 68.08 | 68.41
+SuperGPQA | 51.43 | 52.53 | 47.21 | 51.92 | 50.68 | 52.98
+AIME25 | 38.44 | 49.17 | 31.77 | 43.12 | 48.75 | 49.90
+AIME24 | 49.27 | 54.69 | 31.35 | 54.79 | 54.06 | 64.44
+AIME26 | 48.54 | 55.00 | 28.65 | 49.79 | 53.54 | 58.13
+AMC24 | 57.78 | 61.32 | 47.99 | 62.71 | 60.35 | 62.29
+AMC23 | 82.42 | 87.34 | 66.41 | 90.07 | 82.27 | 87.27
+HMMT | 25.10 | 27.81 | 11.35 | 29.69 | 28.23 | 31.04
+OlympiadBench | 60.83 | 62.61 | 50.30 | 68.84 | 62.46 | 63.50
+Average | 58.83 | 61.68 | 52.90 | 61.33 | 60.66 | 63.02
+
+TABLE A3.T7.5
+Measurement | Samples and aggregation
+Pass@ k and group outcomes | 64 responses for each of 1,024 prompts; compute per-prompt values, then average over prompts.
+Teacher distribution probes | First 512 prompt identities from each policy’s separate one-response run; first 2,048 generated positions with stride four; average over matched positions.
+Token entropy | One separate response for each prompt; average over token positions within lexical categories and response correctness groups.
+
+TABLE A3.E3
+ | \widehat{\mathrm{Pass@}k}(x)=1-\frac{\binom{n-c_{x}}{k}}{\binom{n}{k}},\qquad\widehat{p}_{0,g}(x)=\frac{\binom{n-c_{x}}{g}}{\binom{n}{g}}, |  | (3)
+
+TABLE A3.E4
+ | \widehat{p}_{1,g}(x)=\frac{\binom{c_{x}}{g}}{\binom{n}{g}},\qquad\widehat{p}_{\mathrm{mix},g}(x)=1-\widehat{p}_{0,g}(x)-\widehat{p}_{1,g}(x). |  | (4)
+
+TABLE A3.T8.7
+Policy | Pass@1 | Pass@4 | Pass@8 | Pass@16 | Pass@32 | Pass@64
+Text Base | 18.41 | 42.08 | 54.49 | 65.02 | 73.56 | 80.37
+Text SFT | 29.33 | 51.69 | 60.61 | 67.67 | 73.33 | 77.73
+Text OPD | 19.33 | 43.29 | 55.38 | 65.36 | 73.42 | 79.98
+VL Base | 39.96 | 65.09 | 76.35 | 84.25 | 88.85 | 91.41
+VL SFT | 33.56 | 56.56 | 68.05 | 78.04 | 85.51 | 90.23
+VL OPD-RKL | 48.06 | 70.79 | 79.84 | 86.30 | 90.32 | 92.68
+VL OPD-FKL | 47.81 | 70.99 | 80.19 | 86.77 | 90.69 | 92.68
+
+TABLE A3.T9.6
+Policy | g=4 | g=8 | g=16 | g=32
+Text Base | 57.92 | 45.51 | 34.98 | 26.44
+Text SFT | 48.31 | 39.39 | 32.33 | 26.67
+Text OPD | 56.71 | 44.62 | 34.64 | 26.58
+VL Base | 34.91 | 23.65 | 15.75 | 11.15
+VL SFT | 43.44 | 31.95 | 21.96 | 14.49
+VL OPD-RKL | 29.21 | 20.16 | 13.70 | 9.68
+VL OPD-FKL | 29.01 | 19.81 | 13.23 | 9.31
+
+TABLE A3.T10.6
+Policy | g=4 | g=8 | g=16 | g=32
+Text Base | 39.53 | 53.54 | 64.55 | 73.27
+Text SFT | 41.95 | 55.73 | 65.46 | 72.44
+Text OPD | 40.48 | 54.41 | 64.95 | 73.26
+VL Base | 44.67 | 60.00 | 70.57 | 77.04
+VL SFT | 41.03 | 56.88 | 69.81 | 79.39
+VL OPD | 42.82 | 57.67 | 68.59 | 76.19
+
+TABLE A3.T11.8
+k | Text OPD - SFT | VL OPD-RKL - SFT | VL FKL - RKL
+1 | -10.00\;[-11.26,-8.76] | +14.51\;[+13.27,+15.76] | -0.26\;[-0.90,+0.39]
+4 | -8.40\;[-10.12,-6.66] | +14.23\;[+12.74,+15.78] | +0.20\;[-0.63,+1.06]
+8 | -5.23\;[-7.06,-3.36] | +11.79\;[+10.28,+13.38] | +0.34\;[-0.47,+1.22]
+16 | -2.31\;[-4.26,-0.33] | +8.26\;[+6.75,+9.85] | +0.48\;[-0.31,+1.34]
+32 | +0.09\;[-2.02,+2.23] | +4.81\;[+3.31,+6.37] | +0.37\;[-0.49,+1.30]
+64 | +2.25\;[-0.20,+4.69] | +2.44\;[+0.88,+4.10] | +0.00\;[-1.07,+1.17]
+
+TABLE A3.E5
+ | \mathrm{JS}_{20}(\tilde{p},\tilde{q})=\tfrac{1}{2}\sum_{a\in U}\tilde{p}(a)\log\frac{\tilde{p}(a)}{m(a)}+\tfrac{1}{2}\sum_{a\in U}\tilde{q}(a)\log\frac{\tilde{q}(a)}{m(a)}. |  | (5)
+
+TABLE A3.T12.6
+Policy | Positions | JS \downarrow | Top-1 agreement | Jaccard | Shared teacher mass
+Text Base | 204,692 | 0.01701 | 93.58 | 0.5995 | 99.39
+Text SFT | 244,877 | 0.01720 | 94.25 | 0.6095 | 99.44
+Text OPD | 213,186 | 0.01468 | 93.82 | 0.6106 | 99.38
+VL Base | 188,963 | 0.07734 | 81.89 | 0.5436 | 95.19
+VL SFT | 214,621 | 0.07208 | 83.88 | 0.5305 | 95.69
+VL OPD-RKL | 216,042 | 0.06431 | 83.67 | 0.5691 | 95.70
+VL OPD-FKL | 225,009 | 0.06234 | 83.49 | 0.5579 | 95.98
+
+TABLE A3.T13.5
+Policy | All responses | Correct responses | Incorrect responses
+Text Base | 0.971 | 0.998 | 0.966
+Text SFT | 0.242 | 0.820 | 0.202
+Text OPD | 1.048 | 1.170 | 1.031
+VL Base | 0.622 | 0.762 | 0.573
+VL SFT | 0.214 | 0.287 | 0.196
+VL OPD-RKL | 0.629 | 0.675 | 0.605
+VL OPD-FKL | 0.952 | 0.950 | 0.954
+
+TABLE A4.T14.5
+Distillation prefixes | Objective | Before RL | After RL | Change
+Student (OPD) | RKL | 60.66 | 63.02 | +2.36
+Student (OPD) | FKL | 60.17 | 64.87 | +4.70
+Teacher (TFD) | RKL | 57.09 | 61.90 | +4.82
+Teacher (TFD) | FKL | 56.12 | 59.20 | +3.08
+
+TABLE A4.T15.5
+Benchmark | OPD-RKL | OPD-FKL | FKL - RKL
+MMMU | 67.67 | 70.22 | +2.55
+MMMU-Pro | 54.71 | 55.38 | +0.67
+WeMath | 62.10 | 64.67 | +2.57
+Realworld-QA | 73.46 | 71.76 | -1.70
+MM-Star | 72.13 | 72.53 | +0.40
+SimpleVQA | 55.21 | 56.40 | +1.19
+MMIfeval | 63.55 | 63.16 | -0.39
+MMLongBench-Doc | 49.77 | 49.68 | -0.09
+AI2D | 85.62 | 84.94 | -0.68
+CharXiv-DQ | 89.05 | 88.60 | -0.45
+CharXiv-RQ | 49.20 | 52.20 | +3.00
+MMLU-Pro | 68.41 | 69.16 | +0.75
+SuperGPQA | 52.98 | 56.22 | +3.24
+AIME25 | 49.90 | 52.71 | +2.81
+AIME24 | 64.44 | 60.42 | -4.02
+AIME26 | 58.13 | 59.79 | +1.66
+AMC23 | 87.27 | 91.88 | +4.61
+AMC24 | 62.29 | 70.14 | +7.85
+HMMT | 31.04 | 35.52 | +4.48
+OlympiadBench | 63.50 | 71.96 | +8.46
+Average | 63.0215 | 64.8670 | +1.8455

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>ATESD · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">11 / 11 · 老师来源</p>
+<h1>ATESD：决定老师能看多少参考解答</h1>
+<p class="original">Adaptive Teacher Exposure for Self-Distillation in LLM Reasoning</p>
+<div class="meta"><span>Han, Zhang, Wang et al.</span><span>2026-06-09 · 2605.11458v3</span><a href="https://arxiv.org/abs/2605.11458v3">论文 ↗</a><a href="原文PDF/11-atesd--2605.11458v3.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="atesd" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">学生只看题目，老师额外看参考解答，再给学生指导。ATESD 加一个小控制器，决定老师每次能看多少推理过程；最终答案始终给老师看。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>老师看前五步，学生仍然只看题</h2><p>假设参考解答有十步推理。普通 OPSD 把十步和最终答案全部给老师。ATESD 可以只给前五步和最终答案，再让老师给学生评分。学生没有直接拿到这五步，它仍然只根据题目自己生成回答。</p><p>为什么要这样做？作者观察到老师看完整推理时，给出的目标有时太难让学生吸收。给多少信息，因而变成一个训练中要调整的数，而不再固定为整份答案。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>学生分支</td><td>只看题目，生成自己的回答，参数接受更新。</td></tr><tr><td>老师分支</td><td>同一个模型加上部分参考推理和最终答案；评分时作为固定目标。</td></tr><tr><td>小控制器</td><td>读取训练状态，选择推理保留比例 α。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;训练状态&quot;] --&gt; B[&quot;Beta 控制器选 α&quot;] --&gt; C[&quot;老师看部分推理 + 最终答案&quot;] --&gt; D[&quot;监督学生自己的回答&quot;]
+ D -. 后续学习进展 .-&gt; B</pre></figure><section class="method-block"><h3>1. 先切出老师可以看的参考内容</h3><p>把参考解答分成推理文本和最终答案。假设推理有 L 个 token，保留前 floor(αL) 个，再拼回完整最终答案。α=1 时保留全部推理；α=0 时老师仍知道最终答案，只是看不到推导过程。</p><p>这里裁剪的是老师的输入，不是学生的回答。学生也不会获得一个长度为 αL 的提示。先把这一点分清，就不会误以为这篇在训练学生“看一半答案，再补另一半”。</p></section><section class="method-block"><h3>2. 学生自己回答，师生给同一批位置评分</h3><p>学生看题目生成一条完整回答。然后用同一条回答分别跑学生分支和老师分支：学生只看题目与已经生成的文字；老师还多看到刚才裁剪的参考解答。两边预测的是相同位置的下一 token。</p><p>老师的概率分布作为目标，学生用 forward KL 学习它。你可以把它理解为：老师给一份下一 token 的概率表，学生调整自己的概率表，让二者更接近。老师目标不参与这次反传；实际改变的是学生参数。</p><div class="equation" id="equations"><h4>学生怎样学老师的概率表</h4><div class="math">$$\begin{aligned}L(\theta;\alpha)&amp;=\mathbb E_{y\sim\pi_S}\frac1{|y|}\sum_t\ell_t\\\ell_t&amp;=D_{KL}(p^α_{T,t}\|p_{S,t})\end{aligned}$$</div><p>y 是学生回答，pT 和 pS 是两边在同一位置的概率分布。α 改变老师输入，因而改变老师给出的目标；学生通过缩小这份差别接受训练。</p></div></section><section class="method-block"><h3>3. 让小网络选 α，而不是手动固定它</h3><p>控制器是一个小 MLP。它读取训练进度、最近使用的曝光比例、损失和师生差异的滑动统计、学生置信度等信息，输出一个 Beta 分布，再从中采样 α。Beta 分布用于产生零到一之间的比例。</p><p>采样以后，α 在接下来一个短训练窗口内不变，而且该窗口所有样本共用。学生每一步都更新，控制器隔一段才更新。它目前没有逐题判断“这道题给两步、那道题给八步”，而是按整体训练状态调一个比例。</p></section><section class="method-block"><h3>4. 等学生再学几步，才评价刚才的 α</h3><p>如果只看当前 KL 变小了多少，控制器可能学会少给老师信息，让老师和学生看起来更接近，却没有帮学生掌握新内容。反过来，强一点的监督可能让当前损失较大，但后面几步学得更快。</p><p>所以 ATESD 会等待一个 lookahead 窗口。它累计这段时间里的正向学习进展，并加上老师对参考 token 的预测评分，作为刚才选择 α 的奖励。主实验 lookahead 为二十步。随后用 REINFORCE 更新控制器，让有帮助的比例以后更容易被选到。</p></section><section class="method-block"><h3>5. 学生变强以后，控制器再调整信息量</h3><p>新一轮训练状态已经不同，小网络又会输出新的比例分布。前期合适的 α 不一定适合后期；固定一个比例省事，但没法随学生变化。论文用固定比例扫描和控制器消融来检查，这种调整是否真的带来好处。</p><p>整个过程中，学生回答的采样方式不因为 α 改成老师生成。老师始终是在学生已经写出的文字上评分。最终拿来测试的是训练好的学生，它不会在测试题上自动获得参考解答。</p></section><p class="source-line"><a href="https://arxiv.org/html/2605.11458v3#S3.SS2">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>控制器拿到的是最终数学准确率吗？</h3><p>它的主奖励来自随后几步蒸馏的学习进展和老师参考评分。它没有先撤掉老师，再让学生独立做一长段 RL，最后用那段 RL 的成绩来更新控制器。这正是它与你设想流程的一处具体区别。</p></section><section class="practical-detail"><h3>给老师的信息越少，为什么不总更好？</h3><p>少给信息会让老师目标弱一些，但可能同时减少有用指导。目标是让学生获得帮助，不是单独把师生 KL 压到最低。论文发现中间比例有时更好，也发现不同阶段和难度的偏好不同。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">Qwen3 规模</th><th scope="col">完整曝光 OPSD</th><th scope="col">ATESD</th></tr></thead><tbody><tr><td>1.7B</td><td>43.40</td><td>44.35</td></tr><tr><td>4B</td><td>63.60</td><td>65.65</td></tr><tr><td>8B</td><td>64.80</td><td>67.13</td></tr></tbody></table></div><p class="note">v3 Table 1：AIME24 / AIME25 / HMMT25 的平均 Average@12。该指标是 12 次采样的平均准确率，不是 Pass@12。 <a href="https://arxiv.org/html/2605.11458v3">原文表格 ↗</a></p><p>三个模型规模上的平均分都高于完整曝光的 OPSD。一个更直观的消融是 1.7B 的 AIME24：完整曝光为 57.20，最好固定比例为 57.44，学出的比例策略为 59.17。它说明控制器不只是碰巧选到了一个固定中间值。</p><p>随机改变曝光也没有得到同样效果；只用即时一步反馈的控制器更差。这些结果支持“根据学生后面的学习来选 α”。但实验主要是竞赛数学，基线来自 OPSD 原报告，并按预算内最优 checkpoint 的口径汇报，迁移到别的任务仍需验证。</p><p class="source-line"><a href="https://arxiv.org/html/2605.11458v3#S5">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>Dr. OPD 在老师已经给出目标之后，调整各 token 学多少；ATESD 先改变老师看到的信息，再由老师生成一份不同的目标。它改的是指导内容的来源。</p><details class="project-more"><summary>实验对照建议</summary><p>控制器的反馈来自后续蒸馏进展与老师参考评分，不是 teacher 退出后独立 RL 的最终收益。要区分曝光动作、hold/lookahead 时域和最终评价目标。</p></details></section>
+<p class="endnote">学生一直自己答题；控制器调整老师能看多少解题过程，老师再据此教学生。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2605.11458v3#S3.SS2">曝光定义 ↗</a><a href="https://arxiv.org/html/2605.11458v3#S4">控制器 ↗</a><a href="https://arxiv.org/html/2605.11458v3#S5">结果与限制 ↗</a><a href="sources/11-atesd/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="10-rl-before-rl.html"><small>上一篇</small>RL Starts before RL</a><a href="index.html"><small>回到总览</small>论文总览</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

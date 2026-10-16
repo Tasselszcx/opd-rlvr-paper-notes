@@ -1,0 +1,198 @@
+[TABLE S2.E1]
+ | $a_{t}\sim\pi(\cdot\mid h_{t-1}),$ |  | (1)
+
+[TABLE S2.E2]
+ | $s_{t}\sim\mathrm{P_{s}}(\cdot\mid s_{t-1},a_{t}),\qquad o_{t}\sim\mathrm{P_{o}}(\cdot\mid s_{t}).$ |  | (2)
+
+[TABLE S2.E3]
+ | $\tau_{0}=(q,s_{0}),\;\;\tau_{t}=(q,s_{0},a_{1},s_{1},o_{1},\ldots,a_{t},s_{t},o_{t}),\;\;\tau=(q,s_{0},\ldots,a_{T},s_{T},o_{T},r),$ |  | (3)
+
+[TABLE S2.E4]
+ | $\mathbb{P}_{\mu}^{\pi}(\tau):=\mathbb{E}_{q\sim\mu}\left[\mathbb{P}_{q}^{\pi}(\tau)\right].$ |  | (4)
+
+[TABLE S2.E5]
+ | $h_{0}=H(\tau_{0}):=(q),\quad h_{t}=H(\tau_{t}):=h_{t-1}+(a_{t},o_{t})=(q,a_{1},o_{1},\ldots,a_{t},o_{t}).$ |  | (5)
+
+[TABLE S2.E6]
+ | $d_{\mu,t}^{\pi}(B):=\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\pi}}\!\left[\,\mathbf{1}\{H_{t-1}(\tau)\in B\}\,\right],\quad\text{for any set of contexts }B\subseteq\mathcal{H}.$ |  | (6)
+
+[TABLE S2.E7]
+ | $d_{\mu}^{\pi;w}(B)=\frac{\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\pi}}\left[\sum_{t=1}^{T(\tau)}\left(w_{t}(\tau)\,\cdot\,\mathbf{1}\left\{H_{t-1}(\tau)\in B\right\}\right)\right]}{\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\pi}}\left[\sum_{t=1}^{T(\tau)}w_{t}(\tau)\right]},\quad\text{for any set of contexts }B\subseteq\mathcal{H}.$ |  | (7)
+
+[TABLE S2.E8]
+ | $\displaystyle w_{t}(\tau)=1\;\;\longrightarrow\;\;d_{\mu}^{\pi;\mathbf{1}}(B)$ | $\displaystyle:=d_{\mu}^{\pi;\mathbf{pool}}(B)=\frac{\mathbb{E}_{\tau}\!\left[\sum_{t=1}^{T(\tau)}\mathbf{1}\left\{H_{t-1}(\tau)\in B\right\}\right]}{\mathbb{E}_{\tau}[T(\tau)]},$ |  | (8)
+ | $\displaystyle w_{t}(\tau)=\frac{1}{T(\tau)}\;\;\longrightarrow\;\;d_{\mu}^{\pi;\mathbf{\frac{1}{T}}}(B)$ | $\displaystyle:=d_{\mu}^{\pi;\mathbf{traj}}(B)=\mathbb{E}_{\tau}\!\left[\frac{1}{T(\tau)}\sum_{t=1}^{T(\tau)}\mathbf{1}\left\{H_{t-1}(\tau)\in B\right\}\right].$ | 
+
+[TABLE S2.E9]
+ | $\mathcal{L}_{\mathrm{SFT}}(\theta;d):=\mathbb{E}_{h\sim d}\left[D_{\mathrm{KL}}\!\left(\pi_{e}(\cdot\mid h)\,\middle\|\,\pi_{\theta}(\cdot\mid h)\right)\right].$ |  | (9)
+
+[TABLE S2.E10]
+ | $\widetilde{\mathcal{L}}_{\mathrm{SFT}}(\theta;d):=\mathbb{E}_{h\sim d}\left(\mathbb{E}_{a^{\star}\sim\pi_{e}(\cdot\mid h)}\left[-\log\pi_{\theta}(a^{\star}\mid h)\right]\right)$ |  | (10)
+
+[TABLE S2.E11]
+ | $\mathcal{G}:=(\rho,\pi_{e},n,\Psi,\mathcal{T}_{\mathrm{switch}},K,\Phi),$ |  | (11)
+
+[TABLE S2.E12]
+ | $\widetilde{\tau}=(q,s_{0},a_{1},s_{1},o_{1},\ldots,a_{t^{\prime}-1},s_{t^{\prime}-1},o_{t^{\prime}-1},a^{\star}_{t^{\prime}},s_{t^{\prime}},o_{t^{\prime}},\ldots,a^{\star}_{t^{\prime}+k^{\prime}-1}),$ |  | (12)
+
+[TABLE S2.E13]
+ | $\mathcal{D}_{\mathcal{G}}:=\{(H_{t^{\prime}_{i}-1}(\tau^{i}),\,H(\widetilde{\tau}^{i})[t^{\prime}_{i}:]):i=1,\ldots,N\},$ |  | (13)
+
+[TABLE S2.E14]
+ | $\pi_{1}:=\mathrm{SFT}(\pi_{0},\mathcal{D}_{\mathrm{BC}}).$ |  | (14)
+
+[TABLE S2.T1.2.1]
+Type | $\rho$ | $n$ proposal attempts | $n$ | proposal attempts | $\Psi$ prefix-context filter | $\Psi$ | prefix-context filter | $\mathcal{T}_{\mathrm{switch}}$ | $K$ | $\Phi$ continuation filter | $\Phi$ | continuation filter
+$n$
+proposal attempts
+$\Psi$
+prefix-context filter
+$\Phi$
+continuation filter
+Pure-BC | $\pi_{e}$ teacher | $\pi_{e}$ | teacher | $1,2,\ldots$ full traj. per task | $1,2,\ldots$ | full traj. per task | No filter | $t^{\prime}=1$ from scratch | $t^{\prime}=1$ | from scratch | $T_{\mathrm{max}}$ to finish | $T_{\mathrm{max}}$ | to finish | No filter
+$\pi_{e}$
+teacher
+$1,2,\ldots$
+full traj. per task
+$t^{\prime}=1$
+from scratch
+$T_{\mathrm{max}}$
+to finish
+OP-Short | $\pi_{1}$ | constant † | No filter | $\mathrm{Unif}\{1,\ldots,T(\tau)\}$ trajectory-uniform | $\mathrm{Unif}\{1,\ldots,T(\tau)\}$ | trajectory-uniform | $1,2,\ldots$ capped continuation | $1,2,\ldots$ | capped continuation | No filter
+$\mathrm{Unif}\{1,\ldots,T(\tau)\}$
+trajectory-uniform
+$1,2,\ldots$
+capped continuation
+OP-Success | $\pi_{1}$ | constant | No filter | $\mathrm{Unif}\{1,\ldots,T(\tau)\}$ trajectory-uniform | $\mathrm{Unif}\{1,\ldots,T(\tau)\}$ | trajectory-uniform | $T_{\mathrm{max}}$ to finish | $T_{\mathrm{max}}$ | to finish | $\mathds{1}\{r(\widetilde{\tau})=1\}$ continuation succeeds | $\mathds{1}\{r(\widetilde{\tau})=1\}$ | continuation succeeds
+$\mathrm{Unif}\{1,\ldots,T(\tau)\}$
+trajectory-uniform
+$T_{\mathrm{max}}$
+to finish
+$\mathds{1}\{r(\widetilde{\tau})=1\}$
+continuation succeeds
+OP-Critical | $\pi_{1}$ | constant | $\mathds{1}\{r(\tau)=0\}$ when $\rho$ fails | $\mathds{1}\{r(\tau)=0\}$ | when $\rho$ fails | $\mathrm{Unif}\{1,\ldots,T(\tau)\}$ trajectory-uniform | $\mathrm{Unif}\{1,\ldots,T(\tau)\}$ | trajectory-uniform | $T_{\mathrm{max}}$ to finish | $T_{\mathrm{max}}$ | to finish | $\mathds{1}\{r(\widetilde{\tau})=1\}$ continuation succeeds | $\mathds{1}\{r(\widetilde{\tau})=1\}$ | continuation succeeds
+$\mathds{1}\{r(\tau)=0\}$
+when $\rho$ fails
+$\mathrm{Unif}\{1,\ldots,T(\tau)\}$
+trajectory-uniform
+$T_{\mathrm{max}}$
+to finish
+$\mathds{1}\{r(\widetilde{\tau})=1\}$
+continuation succeeds
+OEC ( Lauffer et al., 2025 ) | OEC | ( Lauffer et al., 2025 ) | $\pi_{1}$ | constant | repetition | $t^{\prime}\sim\nu^{\,\ddagger}\land t^{\prime}\leq T(\tau)$ reject invalid time | $t^{\prime}\sim\nu^{\,\ddagger}\land t^{\prime}\leq T(\tau)$ | reject invalid time | $T_{\mathrm{max}}$ to finish | $T_{\mathrm{max}}$ | to finish | $\mathds{1}\{r(\widetilde{\tau})=1\}$ continuation succeeds | $\mathds{1}\{r(\widetilde{\tau})=1\}$ | continuation succeeds
+OEC
+( Lauffer et al., 2025 )
+$t^{\prime}\sim\nu^{\,\ddagger}\land t^{\prime}\leq T(\tau)$
+reject invalid time
+$T_{\mathrm{max}}$
+to finish
+$\mathds{1}\{r(\widetilde{\tau})=1\}$
+continuation succeeds
+LEAP ( Choudhury and Sodhi, 2025 ) | LEAP | ( Choudhury and Sodhi, 2025 ) | $\pi_{1}$ | constant | $\mathds{1}\{r(\tau)=0\}$ when $\rho$ fails | $\mathds{1}\{r(\tau)=0\}$ | when $\rho$ fails | $t^{\prime}\sim\pi_{e}(\tau)$ Teacher decides | $t^{\prime}\sim\pi_{e}(\tau)$ | Teacher decides | $1$ next turn only | $1$ | next turn only | No filter
+LEAP
+( Choudhury and Sodhi, 2025 )
+$\mathds{1}\{r(\tau)=0\}$
+when $\rho$ fails
+$t^{\prime}\sim\pi_{e}(\tau)$
+Teacher decides
+$1$
+next turn only
+
+[TABLE A2.E15]
+ | $H_{\#}\bar{d}=d,\qquad\tau_{t-1}\sim\bar{d},\qquad h_{t-1}=H(\tau_{t-1}).$ |  | (15)
+
+[TABLE A2.E16]
+ | $y_{\geq t}=(a_{t}^{\star},o_{t},\ldots,a_{t+L-1}^{\star},o_{t+L-1}),\qquad L\leq K,$ |  | (16)
+
+[TABLE A2.E17]
+ | $y_{\geq t}\sim C_{e}^{K}(\cdot\mid\tau_{t-1})$ |  | (17)
+
+[TABLE A2.E18]
+ | $a_{t+j}^{\star}\sim\pi_{e}(\cdot\mid h_{t+j-1}),\qquad s_{t+j}\sim\mathrm{P}_{s}(\cdot\mid s_{t+j-1},a_{t+j}^{\star}),\qquad o_{t+j}\sim\mathrm{P}_{o}(\cdot\mid s_{t+j}),$ |  | (18)
+
+[TABLE A2.E19]
+ | $h_{t+j}=H(\tau_{t+j})=h_{t+j-1}+(a_{t+j}^{\star},o_{t+j}).$ |  | (19)
+
+[TABLE A2.E20]
+ | $p_{\theta}(y_{\geq t}\mid\tau_{t-1})=\prod_{j=0}^{L-1}\pi_{\theta}(a_{t+j}^{\star}\mid h_{t+j-1})\cdot\mathrm{P}_{s}(s_{t+j}\mid s_{t+j-1},a_{t+j}^{\star})\cdot\mathrm{P}_{o}(o_{t+j}\mid s_{t+j}).$ |  | (20)
+
+[TABLE A2.E21]
+ | $\ell_{\mathrm{sft}}(\theta;\tau_{t-1},y_{\geq t})=\sum_{j=0}^{L-1}-\log\pi_{\theta}(a_{t+j}^{\star}\mid h_{t+j-1}).$ |  | (21)
+
+[TABLE A2.E22]
+ | $\widetilde{\mathcal{L}}_{\mathrm{sft}}^{K,\Phi}(\theta;\bar{d})=\mathbb{E}_{\tau_{t-1}\sim\bar{d}}\left[\mathbb{E}_{y_{\geq t}\sim C_{e}^{K,\Phi}(\cdot\mid\tau_{t-1})}\left[\sum_{j=0}^{L(y_{\geq t})-1}-\log\pi_{\theta}(a_{t+j}^{\star}\mid h_{t+j-1})\right]\right].$ |  | (22)
+
+[TABLE A2.EGx1]
+ | $\displaystyle\mathbb{P}\{H_{U-1}(\tau)\in B\mid U\leq T(\tau)\}$ | $\displaystyle=\frac{\mathbb{E}_{q\sim\mu,\,\tau\sim\mathbb{P}_{q}^{\rho}}\left[\sum_{t=1}^{T(\tau)}\frac{1}{T_{\mathrm{max}}}\mathbf{1}\{H_{t-1}(\tau)\in B\}\right]}{\mathbb{E}_{q\sim\mu,\,\tau\sim\mathbb{P}_{q}^{\rho}}\left[\sum_{t=1}^{T(\tau)}\frac{1}{T_{\mathrm{max}}}\right]}$ |  | (23)
+ |  | $\displaystyle=\frac{\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\rho}}\left[\sum_{t=1}^{T(\tau)}\mathbf{1}\{H_{t-1}(\tau)\in B\}\right]}{\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\rho}}[T(\tau)]}=d^{\rho;\mathrm{pool}}_{\mu}(B).$ |  | (24)
+
+[TABLE A2.E25]
+ | $\frac{\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\rho}}\left[\sum_{t=1}^{T(\tau)}\Psi(\tau,t)\,p_{\Phi}(\tau,t)\,\mathbf{1}\{H_{t-1}(\tau)\in B\}\right]}{\mathbb{E}_{\tau\sim\mathbb{P}_{\mu}^{\rho}}\left[\sum_{t=1}^{T(\tau)}\Psi(\tau,t)\,p_{\Phi}(\tau,t)\right]}.$ |  | (25)
+
+[TABLE A2.E26]
+ | $\frac{1}{|\mathcal{Q}_{\mathrm{train}}|}\sum_{q\in\mathcal{Q}_{\mathrm{train}}}\frac{\mathbb{E}_{\tau\sim\mathbb{P}_{q}^{\rho}}\left[\sum_{t=1}^{T(\tau)}\mathbf{1}\{H_{t-1}(\tau)\in B\}\right]}{\mathbb{E}_{\tau\sim\mathbb{P}_{q}^{\rho}}[T(\tau)]},$ |  | (26)
+
+[TABLE A4.T2.2]
+Hyperparameter | Value
+Optimizer | AdamW
+Learning rate | $3\times 10^{-5}$
+LR scheduler | Cosine
+Warmup ratio | 0.1
+Weight decay | 0.01
+Optimizer betas | $(0.9,0.95)$
+Train batch size | 64
+Micro batch size / GPU | 2
+Max sequence length | 4096
+Number of epochs | 3
+Precision | BF16
+
+[TABLE A5.T3.2]
+Hyperparameter | Value
+Optimizer | AdamW
+Learning rate | $5\times 10^{-5}$
+LR scheduler | Cosine
+Warmup ratio | 0.1
+Weight decay | 0.01
+Optimizer betas | $(0.9,0.95)$
+Train batch size | 16
+Micro batch size / GPU | 2
+Max sequence length | 16384
+Number of epochs | 8
+Precision | BF16
+
+[TABLE A6.T4.2]
+Hyperparameter | Value
+Learning rate | $4\times 10^{-5}$
+Train batch size per device | 1
+Gradient Accumulation | 4
+Seed | 42
+Distributed type | Multi-GPU
+Number of devices | 4
+Total train batch size | 16
+Optimizer | AdamW Torch Fused
+Optimizer betas | $(0.9,0.98)$
+Optimizer epsilon | $1\times 10^{-8}$
+Learning rate scheduler | Cosine
+Warmup ratio | 0.1
+Number of epochs | 7.0
+
+[TABLE A6.T5.4.1]
+Base Model | Teacher Model | Type | Prefix Training Data | BC Data | On-policy Data | RL | TB-dev Score ( $\%,\uparrow$ )
+Qwen3-8B | GLM-4.6 | Pure BC | $10\%$ | $10\%$ | 0 | 0 | 11.9
+$25\%$ | $25\%$ | 0 | 10.7
+$50\%$ | $50\%$ | 0 | 11.6
+$75\%$ | $75\%$ | 0 | 14.2
+$100\%$ | $100\%$ | 0 | 13.8
+$100\%$ | $100\%$ | 720 tasks | 16.7
+$100\%$ | $100\%$ | 720 tasks | $17.3^{*}$
+GLM-4.6 | Pure OP | 10% | 0% | 10%  ( $K=3$ ) | 0 | 14.7
+Pure OP | 10% | 0% | 10%  ( $K=\infty$ ) | 0 | 16.7
+BC+OP (different tasks) | 10% | 15% | 10% ( $K=3$ ) | 0 | 15.1
+BC+OP (different tasks) | 10% | 15% | 10% ( $K=3$ ) | 720 tasks | 18.3
+OP-Short | 10% | 2% | 2% ( $K=3$ ) | 0 | 16.1
+OP-Short | 10% | 2% | 2% ( $K=\infty$ ) | 0 | 18.0
+ | OP-Short | 10% | 5% | 5% ( $K=3$ ) | 0 | 19.1
+Qwen3-8B | Baselines | $5.7^{*}$
+Qwen3-235B-A22B | $26.9^{*}$
+GLM-4.6 | $29.9$
+GPT-5 Nano | $37.4^{*}$

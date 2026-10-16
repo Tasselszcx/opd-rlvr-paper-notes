@@ -1,0 +1,33 @@
+{
+  "citation_title": [
+    "Teaching Models to Teach Themselves: Reasoning at the Edge of Learnability"
+  ],
+  "citation_author": [
+    "Sundaram, Shobhita",
+    "Quan, John",
+    "Kwiatkowski, Ariel",
+    "Ahuja, Kartik",
+    "Ollivier, Yann",
+    "Kempe, Julia"
+  ],
+  "citation_date": [
+    "2026/01/26"
+  ],
+  "citation_online_date": [
+    "2026/06/30"
+  ],
+  "citation_pdf_url": [
+    "https://arxiv.org/pdf/2601.18778"
+  ],
+  "citation_arxiv_id": [
+    "2601.18778"
+  ],
+  "citation_abstract": [
+    "RL methods for scaling large reasoning models stall on datasets with low initial success rates, and thus little training signal. We investigate a fundamental question: Can a pretrained LLM leverage latent knowledge to generate an automated curriculum for problems it cannot solve? We explore this with SOAR: An asymmetric self-play framework that uses meta-RL to surface these pedagogical signals. A teacher model proposes synthetic problems for a student model, and is rewarded with its improvement on a subset of hard problems, thus grounding the curriculum in real student progress rather than intrinsic proxy rewards. Our study on the hardest subsets of math benchmarks (0/128 success) reveals three core findings. First, it is possible to realize bilevel meta-RL that unlocks learning under sparse, binary rewards by sharpening a latent capacity of pretrained models to generate useful problems. Second, grounded rewards outperform intrinsic learnability rewards used in prior LLM self-play, reliably avoiding typical instability and diversity collapse modes. Third, the structure and well-posedness of questions are more critical for learning progress than solution correctness. Our results suggest that the ability to generate useful stepping stones does not require the preexisting ability to solve the hard problems, paving a principled path to escape reasoning plateaus without additional curated data"
+  ],
+  "code_links": [
+    "https://github.com/huggingface/math-verify"
+  ],
+  "version": "2601.18778v3",
+  "id": "soar"
+}

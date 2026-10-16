@@ -1,0 +1,308 @@
+TABLE p1.1
+
+
+TABLE S3.E1
+ | y_{i}=(a_{i,1},\ldots,a_{i,T_{i}})\sim\pi_{\theta_{\mathrm{old}}}(\cdot\mid x_{i}),\qquad s_{i,t}=(x_{i},a_{i,<t}), |  | (1)
+
+TABLE S3.E2
+ | A_{i,t}=\operatorname{sg}[u^{\mathrm{T}}_{i,t}-u^{\mathrm{old}}_{i,t}],\qquad r_{i,t}(\theta)=\exp(u^{\theta}_{i,t}-u^{\mathrm{old}}_{i,t}), |  | (2)
+
+TABLE S3.E3
+ | \ell^{\mathrm{OPD}}_{i,t}(\theta)=\max\!\left(-A_{i,t}r_{i,t}(\theta),-A_{i,t}r^{\mathrm{clip}}_{i,t}\right). |  | (3)
+
+TABLE S3.E4
+ | \displaystyle z_{i,t} | \displaystyle=q_{\eta}(\operatorname{sg}[f_{i,t}]), | \displaystyle\bar{z}_{i} | \displaystyle=\frac{1}{n_{i}}\sum_{s}m_{i,s}z_{i,s}, |  | (4)
+ | \displaystyle\widetilde{w}_{\eta,i,t} | \displaystyle=1+\rho\tanh(z_{i,t}-\bar{z}_{i}), | \displaystyle w_{\eta,i,t} | \displaystyle=m_{i,t}\widetilde{w}_{\eta,i,t}\frac{n_{i}}{\sum_{s}m_{i,s}\widetilde{w}_{\eta,i,s}}. | 
+
+TABLE S3.E5
+ | \mathcal{L}_{\mathrm{in}}(\theta,\eta;B)=\frac{1}{N_{B}}\sum_{i,t}m_{i,t}w_{\eta,i,t}\ell^{\mathrm{OPD}}_{i,t}(\theta),\qquad N_{B}=\sum_{i,t}m_{i,t}. |  | (5)
+
+TABLE S3.E6
+ | \theta^{\prime}(\eta)=\mathcal{A}_{\mathrm{AdamW}}\!\left(\theta,\mathcal{C}\!\left(\boldsymbol{g}_{\mathrm{in}}(\eta)\right);\mathsf{S}\right). |  | (6)
+
+TABLE S3.E7
+ | \mathcal{L}_{\mathrm{out}}(\theta^{\prime};B^{\mathrm{ref}})=-\frac{1}{N_{\mathrm{ref}}}\sum_{j,t}m^{\mathrm{ref}}_{j,t}\log\pi_{\theta^{\prime}}(y_{j,t}^{\star}\mid x_{j}^{\star},y_{j,<t}^{\star}),\qquad N_{\mathrm{ref}}=\sum_{j,t}m^{\mathrm{ref}}_{j,t}. |  | (7)
+
+TABLE S3.E8
+ | \mathcal{R}_{w}(\eta;B)=\frac{1}{N_{B}}\sum_{i,t}m_{i,t}(w_{\eta,i,t}-1)^{2}. |  | (8)
+
+TABLE S3.E9
+ | \mathcal{J}_{\mathrm{meta}}(\eta)=\mathcal{L}_{\mathrm{out}}(\theta^{\prime}(\eta);B^{\mathrm{ref}})+\lambda_{w}^{(r)}\mathcal{R}_{w}(\eta;B). |  | (9)
+
+TABLE S3.E10
+ | \displaystyle\nabla_{\eta}\mathcal{J}_{\mathrm{meta}} | \displaystyle=\left(\frac{\partial\theta^{\prime}(\eta)}{\partial\eta}\right)^{\top}\nabla_{\theta^{\prime}}\mathcal{L}_{\mathrm{out}}\bigl(\theta^{\prime}(\eta);B^{\mathrm{ref}}\bigr)+\lambda_{w}^{(r)}\nabla_{\eta}\mathcal{R}_{w}(\eta;B). |  | (10)
+
+TABLE S3.E11
+ | (\eta^{+},\mathsf{M}^{+})=\operatorname{AdamWStep}_{\eta}(\eta,\nabla_{\eta}\mathcal{J}_{\mathrm{meta}};\mathsf{M}). |  | (11)
+
+TABLE S3.E12
+ | \displaystyle\boldsymbol{g}_{\mathrm{real}} | \displaystyle=\frac{1}{N_{B}}\sum_{i,t}m_{i,t}\operatorname{sg}[w_{\eta^{+},i,t}]\nabla_{\theta}\ell^{\mathrm{OPD}}_{i,t}(\theta), |  | (12)
+ | \displaystyle(\theta^{+},\mathsf{S}^{+}) | \displaystyle=\operatorname{AdamWStep}_{\theta}(\theta,\mathcal{C}(\boldsymbol{g}_{\mathrm{real}});\mathsf{S}). | 
+
+TABLE S3.E13
+ | \boldsymbol{g}_{\mathrm{in}}(\eta)=\frac{1}{N_{B}}\sum_{i,t}m_{i,t}w_{\eta,i,t}\boldsymbol{g}_{i,t}. |  | (13)
+
+TABLE S3.E14
+ | \boldsymbol{d}=-J_{\mathcal{C}}^{\top}J_{\mathcal{A}}^{\top}\boldsymbol{g}_{\mathrm{out}}. |  | (14)
+
+TABLE S3.E15
+ | c_{i,t}=\langle\boldsymbol{d},\boldsymbol{g}_{i,t}\rangle,\qquad\nabla_{\eta}\mathcal{L}_{\mathrm{out}}=-\frac{1}{N_{B}}\sum_{i,t}m_{i,t}c_{i,t}\nabla_{\eta}w_{\eta,i,t}. |  | (15)
+
+TABLE S3.E16
+ | \frac{\partial\mathcal{L}_{\mathrm{out}}}{\partial\widetilde{w}_{i,j}}=-\frac{c_{i,j}-\bar{c}_{i}^{\,w}}{N_{B}\overline{w}_{i}},\qquad\bar{c}_{i}^{\,w}=\frac{1}{n_{i}}\sum_{t}m_{i,t}w_{i,t}c_{i,t}. |  | (16)
+
+TABLE S3.E17
+ | \widehat{\mathcal{L}}_{\mathrm{meta}}^{(r)}(\eta;B,\boldsymbol{c})=-\frac{1}{N_{B}}\sum_{i,t}m_{i,t}w_{\eta,i,t}\operatorname{sg}[c_{i,t}]+\lambda_{w}^{(r)}\mathcal{R}_{w}(\eta;B). |  | (17)
+
+TABLE S3.T1.2.1
+Method | Avg@8 | Pass@8
+MATH500 | AMC23 | Minerva | HMMT | AIME24 | AIME25 | Avg. | MATH500 | AMC23 | Minerva | HMMT | AIME24 | AIME25 | Avg.
+Teacher Qwen3-8B \rightsquigarrow Student Qwen3-0.6B-Base
+KD | 47.90 | 23.75 | 14.25 | 0.42 | 2.50 | 0.83 | 14.94 | 69.20 | 50.00 | 31.25 | 3.33 | 6.67 | 6.67 | 27.85
+GRPO | 53.20 | 28.44 | 16.31 | 0.83 | 4.17 | 1.25 | 17.37 | 75.00 | 57.50 | 32.35 | 6.67 | 6.67 | 10.00 | 31.36
+OPD | 50.28 | 25.00 | 15.95 | 0.42 | 2.92 | 1.25 | 15.97 | 73.00 | 55.00 | 31.62 | 3.33 | 10.00 | 6.67 | 29.94
+EOPD | 50.40 | 27.50 | 16.08 | 1.67 | 3.75 | 1.25 | 16.78 | 75.60 | 52.50 | 34.19 | 6.67 | 13.33 | 6.67 | 31.49
+FiRe-OPD | 50.98 | 29.38 | 16.27 | 0.83 | 2.92 | 0.83 | 16.87 | 73.60 | 62.50 | 31.99 | 3.33 | 10.00 | 6.67 | 31.35
+REOPOLD | 50.73 | 26.56 | 15.35 | 1.67 | 3.33 | 0.00 | 16.27 | 74.40 | 57.50 | 31.25 | 3.33 | 13.33 | 0.00 | 29.97
+TIP | 51.68 | 29.69 | 16.45 | 1.25 | 2.08 | 1.25 | 17.07 | 74.60 | 62.50 | 31.99 | 6.67 | 10.00 | 10.00 | 32.63
+MetaOPD | 52.88 | 30.31 | 16.68 | 2.08 | 3.75 | 2.08 | 17.96 | 78.40 | 62.50 | 34.56 | 10.00 | 16.67 | 13.33 | 35.91
+Abs. \Delta_{\mathrm{OPD}} | +2.60 | +5.31 | +0.73 | +1.66 | +0.83 | +0.83 | +1.99 | +5.40 | +7.50 | +2.94 | +6.67 | +6.67 | +6.66 | +5.97
+Rel. \Delta_{\mathrm{OPD}} | +5.17% | +21.24% | +4.58% | +395.24% | +28.42% | +66.40% | +12.46% | +7.40% | +13.64% | +9.30% | +200.30% | +66.70% | +99.85% | +19.94%
+Teacher Qwen3-8B \rightsquigarrow Student Qwen3-1.7B-Base
+KD | 62.93 | 38.13 | 27.02 | 1.25 | 10.00 | 3.75 | 23.85 | 84.80 | 72.50 | 43.38 | 3.33 | 20.00 | 16.67 | 40.11
+GRPO | 66.85 | 37.81 | 28.26 | 1.67 | 8.75 | 5.42 | 24.79 | 83.20 | 72.50 | 48.16 | 3.33 | 23.33 | 16.67 | 41.20
+OPD | 67.23 | 38.75 | 27.80 | 1.67 | 8.33 | 6.67 | 25.07 | 84.20 | 67.50 | 47.43 | 6.67 | 20.00 | 16.67 | 40.41
+EOPD | 67.60 | 40.63 | 27.48 | 1.25 | 10.83 | 7.08 | 25.81 | 83.80 | 72.50 | 44.12 | 6.67 | 30.00 | 20.00 | 42.85
+FiRe-OPD | 68.55 | 40.31 | 28.45 | 2.08 | 7.92 | 7.08 | 25.73 | 85.80 | 72.50 | 43.38 | 6.67 | 16.67 | 23.33 | 41.39
+REOPOLD | 68.85 | 36.25 | 28.77 | 1.67 | 10.83 | 6.67 | 25.51 | 86.40 | 65.00 | 44.85 | 6.67 | 23.33 | 20.00 | 41.04
+TIP | 68.75 | 41.25 | 27.53 | 1.67 | 11.25 | 6.67 | 26.19 | 86.80 | 72.50 | 45.59 | 10.00 | 30.00 | 26.67 | 45.26
+MetaOPD | 69.95 | 43.75 | 27.71 | 2.08 | 12.08 | 8.33 | 27.32 | 88.20 | 77.50 | 48.53 | 10.00 | 33.33 | 23.33 | 46.82
+Abs. \Delta_{\mathrm{OPD}} | +2.72 | +5.00 | -0.09 | +0.41 | +3.75 | +1.66 | +2.25 | +4.00 | +10.00 | +1.10 | +3.33 | +13.33 | +6.66 | +6.41
+Rel. \Delta_{\mathrm{OPD}} | +4.05% | +12.90% | -0.32% | +24.55% | +45.02% | +24.89% | +8.97% | +4.75% | +14.81% | +2.32% | +49.93% | +66.65% | +39.95% | +15.86%
+
+TABLE S4.T2.2
+Benchmark | Metric | Base Model | KD | GRPO | OPD | EOPD | FiRe-OPD | REOPOLD | TIP | MetaOPD
+GPQA-Diamond | Avg@8 | 15.09 | 21.09 | 19.26 | 26.20 | 25.44 | 25.82 | 26.52 | 27.15 | 27.27
+Pass@8 | 69.19 | 75.25 | 77.27 | 77.78 | 76.26 | 76.77 | 76.26 | 74.75 | 78.28
+MMLU-Pro | Pass@1 | 7.28 | 38.13 | 41.86 | 41.57 | 40.93 | 41.51 | 39.52 | 41.90 | 42.30
+AlpacaEval 2.0 | LC-WR | 1.21 | 14.72 | 13.12 | 15.96 | 15.19 | 15.14 | 16.06 | 16.70 | 15.98
+WR | 2.03 | 16.09 | 14.63 | 17.97 | 17.17 | 17.13 | 17.37 | 19.14 | 18.08
+All metrics | Avg. | 18.96 | 33.06 | 33.23 | 35.90 | 35.00 | 35.27 | 35.15 | 35.93 | 36.38
+
+TABLE S4.T3.2
+Variant | Avg@8 | Pass@8
+Uniform OPD | 25.07 | 40.41
+Position only | 25.21 | 39.32
+Teacher entropy only | 26.75 | 43.25
+Log-probability gap only | 25.42 | 43.62
+Top-32 profiles only | 25.70 | 42.24
+MetaOPD (all features) | 27.32 | 46.82
+
+TABLE A1.E18
+ | \displaystyle u^{\mathrm{old}}_{i,t} | \displaystyle=\log\pi_{\theta_{\mathrm{old}}}(a_{i,t}\mid s_{i,t}), |  | (18)
+ | \displaystyle u^{\theta}_{i,t} | \displaystyle=\log\pi_{\theta}(a_{i,t}\mid s_{i,t}), | 
+ | \displaystyle u^{\mathrm{T}}_{i,t} | \displaystyle=\log\pi_{\mathrm{T}}\!\left(\mu(a_{i,t})\mid\mathcal{T}(s_{i,t})\right). | 
+
+TABLE A1.Ex1
+ | Z_{\mu}(s)=\sum_{a\in\mathcal{V}_{\mathrm{S}}}\pi_{\mathrm{T}}(\mu(a)\mid\mathcal{T}(s)),\qquad\pi_{\mathrm{T}}^{\mu}(a\mid s)=\frac{\pi_{\mathrm{T}}(\mu(a)\mid\mathcal{T}(s))}{Z_{\mu}(s)}. | 
+
+TABLE A1.Ex2
+ | \KL\!\left(\pi_{\theta}(\cdot\mid s)\,\middle\|\,\pi_{\mathrm{T}}^{\mu}(\cdot\mid s)\right)=\mathbb{E}_{a\sim\pi_{\theta}}\left[u^{\theta}(a)-u^{\mathrm{T}}(a)+\log Z_{\mu}(s)\right]. | 
+
+TABLE A1.EGx1
+ | \displaystyle\nabla_{\theta}\KL(\pi_{\theta}\|\pi_{\mathrm{T}}^{\mu}) | \displaystyle=\mathbb{E}_{a\sim\pi_{\theta}}\left[\left(u^{\theta}(a)-u^{\mathrm{T}}(a)+\log Z_{\mu}(s)+1\right)\nabla_{\theta}\log\pi_{\theta}(a\mid s)\right] | 
+ |  | \displaystyle=\mathbb{E}_{a\sim\pi_{\theta}}\left[\left(u^{\theta}(a)-u^{\mathrm{T}}(a)\right)\nabla_{\theta}\log\pi_{\theta}(a\mid s)\right], |  | (19)
+
+TABLE A1.Ex4
+ | \left.\nabla_{\theta}[-A(a)r(a;\theta)]\right|_{\theta=\theta_{\mathrm{old}}}=\left(u^{\mathrm{old}}(a)-u^{\mathrm{T}}(a)\right)\left.\nabla_{\theta}\log\pi_{\theta}(a\mid s)\right|_{\theta=\theta_{\mathrm{old}}}, | 
+
+TABLE A1.Ex5
+ | \mathbb{E}_{a\sim\pi_{\theta_{\mathrm{old}}}}\!\left[-A(a)r(a;\theta)\right]=\mathbb{E}_{a\sim\pi_{\theta}}\!\left[u^{\mathrm{old}}(a)-u^{\mathrm{T}}(a)\right]. | 
+
+TABLE A1.Ex6
+ | \overline{w}_{i}=\frac{1}{n_{i}}\sum_{t}m_{i,t}\widetilde{w}_{i,t}. | 
+
+TABLE A1.Ex7
+ | \frac{1}{n_{i}}\sum_{t}m_{i,t}w_{i,t}=1. | 
+
+TABLE A1.Ex8
+ | w_{i,t}\in\left(\frac{1-\rho}{1+\rho},\frac{1+\rho}{1-\rho}\right). | 
+
+TABLE A1.Ex9
+ | \frac{\partial w_{i,t}}{\partial\widetilde{w}_{i,j}}=\frac{\mathbb{I}[t=j]}{\overline{w}_{i}}-\frac{\widetilde{w}_{i,t}}{n_{i}\overline{w}_{i}^{2}}, | 
+
+TABLE A1.Ex10
+ | \frac{\partial\mathcal{L}_{\mathrm{out}}}{\partial\widetilde{w}_{i,j}}=-\frac{1}{N_{B}\overline{w}_{i}}\left(c_{i,j}-\frac{1}{n_{i}}\sum_{t}m_{i,t}w_{i,t}c_{i,t}\right). | 
+
+TABLE A1.Ex11
+ | P_{i}=I-\frac{1}{n_{i}}\boldsymbol{1}\boldsymbol{1}^{\top},\qquad\boldsymbol{z}_{i}^{\circ}=P_{i}\boldsymbol{z}_{i},\qquad D_{i}=\operatorname{diag}\!\left(\rho[1-\tanh^{2}(z_{i,t}^{\circ})]\right). | 
+
+TABLE A1.E20
+ | \frac{\partial\boldsymbol{w}_{i}}{\partial\boldsymbol{z}_{i}}=J_{i}D_{i}P_{i},\qquad\nabla_{\boldsymbol{z}_{i}}\mathcal{L}_{\mathrm{out}}=-\frac{1}{N_{B}}P_{i}D_{i}J_{i}^{\top}\boldsymbol{c}_{i}. |  | (20)
+
+TABLE A1.E21
+ | \kappa_{\mathrm{clip}}=\min\!\left(1,\frac{G_{\max}}{n+\varepsilon_{\mathrm{clip}}}\right),\qquad\overline{\boldsymbol{g}}_{\mathrm{in}}(\eta)=\mathcal{C}(\boldsymbol{g}_{\mathrm{in}}(\eta))=\kappa_{\mathrm{clip}}\boldsymbol{g}_{\mathrm{in}}(\eta). |  | (21)
+
+TABLE A1.E22
+ | J_{\mathcal{C}}=\begin{cases}I,&n+\varepsilon_{\mathrm{clip}}<G_{\max},\\[2.0pt] \displaystyle\kappa_{\mathrm{clip}}I-\frac{G_{\max}}{n(n+\varepsilon_{\mathrm{clip}})^{2}}\boldsymbol{g}_{\mathrm{in}}(\eta)\boldsymbol{g}_{\mathrm{in}}(\eta)^{\top},&n+\varepsilon_{\mathrm{clip}}>G_{\max},\ n>0.\end{cases} |  | (22)
+
+TABLE A1.E23
+ | \displaystyle\boldsymbol{m}_{j}^{+} | \displaystyle=\beta_{1,j}\boldsymbol{m}_{j}+(1-\beta_{1,j})\overline{\boldsymbol{g}}_{\mathrm{in},j}(\eta), |  | (23)
+ | \displaystyle\boldsymbol{v}_{j}^{+} | \displaystyle=\beta_{2,j}\boldsymbol{v}_{j}+(1-\beta_{2,j})\overline{\boldsymbol{g}}_{\mathrm{in},j}(\eta)^{\,2}, | 
+ | \displaystyle\widehat{\boldsymbol{m}}_{j} | \displaystyle=\frac{\boldsymbol{m}_{j}^{+}}{1-\beta_{1,j}^{\,\tau_{j}+1}}, | \displaystyle\widehat{\boldsymbol{v}}_{j} | \displaystyle=\frac{\boldsymbol{v}_{j}^{+}}{1-\beta_{2,j}^{\,\tau_{j}+1}}, | 
+ | \displaystyle\theta^{\prime}_{j} | \displaystyle=(1-\alpha_{j}\lambda_{j})\theta_{j}-\alpha_{j}\frac{\widehat{\boldsymbol{m}}_{j}}{\sqrt{\widehat{\boldsymbol{v}}_{j}}+\varepsilon_{j}}. | 
+
+TABLE A1.Ex12
+ | \zeta_{1,j}=\frac{1-\beta_{1,j}}{1-\beta_{1,j}^{\,\tau_{j}+1}},\qquad\zeta_{2,j}=\frac{1-\beta_{2,j}}{1-\beta_{2,j}^{\,\tau_{j}+1}},\qquad\sigma_{j,k}=\sqrt{\widehat{v}_{j,k}}, | 
+
+TABLE A1.E24
+ | \frac{\partial\theta^{\prime}_{j,k}}{\partial\overline{g}_{\mathrm{in},j,k}(\eta)}=-\alpha_{j}\left[\frac{\zeta_{1,j}}{\sigma_{j,k}+\varepsilon_{j}}-\frac{\zeta_{2,j}\widehat{m}_{j,k}\overline{g}_{\mathrm{in},j,k}(\eta)}{\sigma_{j,k}(\sigma_{j,k}+\varepsilon_{j})^{2}}\right]. |  | (24)
+
+TABLE A1.E25
+ | G_{\eta}:=\frac{\partial\boldsymbol{g}_{\mathrm{in}}(\eta)}{\partial\eta}=\frac{1}{N_{B}}\sum_{i,t}m_{i,t}\boldsymbol{g}_{i,t}\left(\nabla_{\eta}w_{\eta,i,t}\right)^{\top}\in\mathbb{R}^{p\times q},\qquad\frac{\partial\theta^{\prime}}{\partial\eta}=J_{\mathcal{A}}J_{\mathcal{C}}G_{\eta}. |  | (25)
+
+TABLE A1.E26
+ | \nabla_{\eta}\mathcal{L}_{\mathrm{out}}=\left(\frac{\partial\boldsymbol{g}_{\mathrm{in}}(\eta)}{\partial\eta}\right)^{\top}J_{\mathcal{C}}^{\top}J_{\mathcal{A}}^{\top}\boldsymbol{g}_{\mathrm{out}}=G_{\eta}^{\top}J_{\mathcal{C}}^{\top}J_{\mathcal{A}}^{\top}\boldsymbol{g}_{\mathrm{out}}. |  | (26)
+
+TABLE A1.E27
+ | \nabla_{\eta}\mathcal{L}_{\mathrm{out}}=-\frac{1}{N_{B}}\sum_{i,t}m_{i,t}\left(\nabla_{\eta}w_{\eta,i,t}\right)\boldsymbol{g}_{i,t}^{\top}\boldsymbol{d}=-\frac{1}{N_{B}}\sum_{i,t}m_{i,t}c_{i,t}\nabla_{\eta}w_{\eta,i,t}. |  | (27)
+
+TABLE A1.Ex13
+ | \displaystyle\left.\nabla_{\eta}\widehat{\mathcal{L}}_{\mathrm{meta}}^{(r)}(\eta;B,\boldsymbol{c}^{0})\right|_{\eta_{0}} | \displaystyle=-\frac{1}{N_{B}}\sum_{i,t}m_{i,t}c^{0}_{i,t}\left.\nabla_{\eta}w_{\eta,i,t}\right|_{\eta_{0}}+\lambda_{w}^{(r)}\left.\nabla_{\eta}\mathcal{R}_{w}\right|_{\eta_{0}} | 
+ |  | \displaystyle=\left.\nabla_{\eta}\mathcal{J}_{\mathrm{meta}}\right|_{\eta_{0}}. | 
+
+TABLE A2.T4.2
+Feature group | Features | Dim. | Detached
+Sampled action | Current-student log-probability, teacher log-probability, and teacher-minus-current log-probability gap | 3 | Yes
+Uncertainty | Vocabulary-normalized student and teacher entropy | 2 | Yes
+Top-1 behavior | Student and teacher top-1 probability; student–teacher top-1 identity match | 3 | Yes
+Position and overlap | Position normalized by the common completion-window width; student–teacher top-32 set overlap | 2 | Yes
+Ranked probabilities | Student top-32 and teacher top-32 full-vocabulary-normalized log-probability values | 64 | Yes
+Total | Ten scalar statistics plus two ranked top-32 vectors | 74 | Yes
+
+TABLE A2.Ex14
+ | h^{\mathrm{S}}=\frac{-\sum_{a\in\mathcal{V}_{\mathrm{S}}}p^{\mathrm{S}}(a)\log p^{\mathrm{S}}(a)}{\log|\mathcal{V}_{\mathrm{S}}|},\qquad h^{\mathrm{T}}=\frac{-\sum_{a\in\mathcal{V}_{\mathrm{T}}}p^{\mathrm{T}}(a)\log p^{\mathrm{T}}(a)}{\log|\mathcal{V}_{\mathrm{T}}|}. | 
+
+TABLE A2.Ex15
+ | \operatorname{Overlap}_{32}=\frac{1}{32}\sum_{a\in S_{32}}\mathbb{I}\!\left[a\in\operatorname{Canon}(T_{32})\right]. | 
+
+TABLE A2.T5.2
+Setting | Value
+Student / teacher models | Qwen3-0.6B-Base or Qwen3-1.7B-Base / frozen Qwen3-8B
+Training data / MetaOPD reference-solution data | MATH train / MATH train
+MetaOPD rollout / reference sampling | Separate shuffled streams; overlap allowed; no meta split
+Shared epochs / training seed | 3 / 42
+Shared rollout and update schedule | 174 rollout iterations; four student updates per rollout; 696 student updates
+Shared batch sizes | 128 rollout / 32 student optimizer; global reference batch 32 where used
+Shared student optimizer / learning rate | AdamW / 3\times 10^{-6} , cosine decay
+MetaOPD meta optimizer / initial learning rate | AdamW / 2.5\times 10^{-5} ; scaled by the student learning-rate ratio
+MetaOPD virtual optimizer / state | Same AdamW rule as the actual student update; current student optimizer state, without committing changes
+MetaOPD virtual learning rates | Current real student optimizer rates, including scheduled decay
+Student gradient clipping | Full-model global norm, threshold 1.0 in virtual and actual steps
+Sampled-OPD ratio clipping | (\epsilon_{l},\epsilon_{h})=(0.2,0.2)
+MetaOPD residual / initial regularizer | \rho=0.25 / \lambda_{w}^{(0)}=10^{-3} ; regularizer follows the student learning-rate ratio
+MetaOPD score centering / meta updates | Valid-response mean subtracted before \tanh / one per student update
+Shared training decoding | Temperature 1.0; top- p 1.0; maximum completion 4096
+Math evaluation decoding | Eight samples; temperature 1.0; top- p 0.8; maximum response 8192
+Allocation for reported GPU-hours | Eight NVIDIA A100 80GB GPUs: four student DDP and four paired teacher GPUs
+
+TABLE A2.T6.2
+Method | Configuration
+FiRe-OPD | Trajectory drop fraction 0.2; teacher-confidence and student-confusion coefficients both 1.0
+REOPOLD | Reward parameter \lambda=0.3 ; phase switch at update 232; phase-II entropy keep fraction 0.2
+TIP | Soft-OR; response-level keep fraction 0.5; entropy clipping at the 98th percentile; exact-KL computation in 64-token chunks
+
+TABLE A2.Ex16
+ | c^{\mathrm{T}}_{i,t}=1-\frac{h^{\mathrm{T}}_{i,t}}{\max_{B}h^{\mathrm{T}}},\qquad c^{\mathrm{S}}_{i,t}=\frac{h^{\mathrm{S}}_{i,t}}{\max_{B}h^{\mathrm{S}}}. | 
+
+TABLE A2.E28
+ | \chi_{r}=\min\!\left(1,\max\!\left(0,\max_{g}\frac{\alpha_{g}^{(r)}}{\alpha_{0}}\right)\right),\quad\alpha_{\eta}^{(r)}=\alpha_{\eta,0}\chi_{r},\quad\lambda_{w}^{(r)}=\lambda_{w}^{(0)}\chi_{r}, |  | (28)
+
+TABLE A2.Ex17
+ | \mathcal{L}_{\mathrm{student}}=\mathcal{L}_{\mathrm{OPD}}^{w}+\gamma\mathcal{L}_{\mathrm{SFT}}. | 
+
+TABLE A2.Ex18
+ | \gamma^{\star}=\operatorname{median}_{k=1}^{16}\frac{\lVert\nabla_{\theta}\mathcal{L}_{\mathrm{OPD}}^{(k)}\rVert_{2}}{\lVert\nabla_{\theta}\mathcal{L}_{\mathrm{SFT}}^{(k)}\rVert_{2}+10^{-12}}. | 
+
+TABLE A2.T7.2
+Variant | Token weighting | Reference use | Student objective
+Uniform OPD | Uniform | None | \mathcal{L}_{\mathrm{OPD}}
+Position only | Position | Outer | \mathcal{L}_{\mathrm{OPD}}^{w}
+Teacher entropy | Teacher entropy | Outer | \mathcal{L}_{\mathrm{OPD}}^{w}
+Log-probability gap | \delta_{i,t} | Outer | \mathcal{L}_{\mathrm{OPD}}^{w}
+Top-32 profiles | Student + teacher profiles | Outer | \mathcal{L}_{\mathrm{OPD}}^{w}
+MetaOPD | All 74 descriptors | Outer | \mathcal{L}_{\mathrm{OPD}}^{w}
+SFT | None | Direct only | \mathcal{L}_{\mathrm{SFT}}
+OPD + SFT (half) | Uniform | Direct only | \mathcal{L}_{\mathrm{OPD}}+0.5\gamma^{\star}\mathcal{L}_{\mathrm{SFT}}
+OPD + SFT | Uniform | Direct only | \mathcal{L}_{\mathrm{OPD}}+\gamma^{\star}\mathcal{L}_{\mathrm{SFT}}
+OPD + SFT (double) | Uniform | Direct only | \mathcal{L}_{\mathrm{OPD}}+2\gamma^{\star}\mathcal{L}_{\mathrm{SFT}}
+MetaOPD + SFT | All 74 descriptors | Outer + direct | \mathcal{L}_{\mathrm{OPD}}^{w}+\gamma^{\star}\mathcal{L}_{\mathrm{SFT}}
+
+TABLE A2.T8.2.1
+Variant | Avg@8 | Pass@8
+ | MATH500 | AMC23 | Minerva | HMMT | AIME24 | AIME25 | Avg. | MATH500 | AMC23 | Minerva | HMMT | AIME24 | AIME25 | Avg.
+Uniform OPD | 67.23 | 38.75 | 27.80 | 1.67 | 8.33 | 6.67 | 25.07 | 84.20 | 67.50 | 47.43 | 6.67 | 20.00 | 16.67 | 40.41
+Position only | 68.50 | 39.69 | 26.01 | 1.67 | 9.58 | 5.83 | 25.21 | 88.00 | 67.50 | 43.75 | 3.33 | 20.00 | 13.33 | 39.32
+Teacher entropy only | 68.88 | 43.75 | 27.85 | 2.50 | 11.25 | 6.25 | 26.75 | 86.60 | 72.50 | 47.06 | 10.00 | 26.67 | 16.67 | 43.25
+Log-probability gap only | 68.50 | 39.38 | 26.75 | 1.67 | 8.75 | 7.50 | 25.42 | 87.80 | 75.00 | 45.59 | 6.67 | 26.67 | 20.00 | 43.62
+Top-32 profiles only | 69.05 | 40.94 | 27.57 | 1.67 | 8.33 | 6.67 | 25.70 | 88.40 | 75.00 | 46.69 | 3.33 | 20.00 | 20.00 | 42.24
+MetaOPD (all features) | 69.95 | 43.75 | 27.71 | 2.08 | 12.08 | 8.33 | 27.32 | 88.20 | 77.50 | 48.53 | 10.00 | 33.33 | 23.33 | 46.82
+
+TABLE A2.T9.2.1
+Variant | Avg@8 | Pass@8
+ | MATH500 | AMC23 | Minerva | HMMT | AIME24 | AIME25 | Avg. | MATH500 | AMC23 | Minerva | HMMT | AIME24 | AIME25 | Avg.
+Uniform OPD | 67.23 | 38.75 | 27.80 | 1.67 | 8.33 | 6.67 | 25.07 | 84.20 | 67.50 | 47.43 | 6.67 | 20.00 | 16.67 | 40.41
+SFT | 32.85 | 14.06 | 11.76 | 1.25 | 0.83 | 0.00 | 10.13 | 65.40 | 52.50 | 34.93 | 6.67 | 6.67 | 0.00 | 27.69
+OPD + SFT ( 0.5\gamma^{\star} ) | 67.45 | 38.44 | 23.99 | 2.50 | 7.92 | 6.67 | 24.49 | 86.60 | 75.00 | 43.75 | 10.00 | 16.67 | 16.67 | 41.45
+OPD + SFT ( \gamma^{\star} ) | 63.00 | 33.75 | 23.53 | 2.08 | 7.50 | 6.25 | 22.69 | 86.20 | 77.50 | 45.59 | 6.67 | 23.33 | 13.33 | 42.10
+OPD + SFT ( 2\gamma^{\star} ) | 57.25 | 27.81 | 22.75 | 1.25 | 8.33 | 5.42 | 20.47 | 86.20 | 67.50 | 47.79 | 10.00 | 20.00 | 20.00 | 41.92
+MetaOPD | 69.95 | 43.75 | 27.71 | 2.08 | 12.08 | 8.33 | 27.32 | 88.20 | 77.50 | 48.53 | 10.00 | 33.33 | 23.33 | 46.82
+MetaOPD + SFT | 60.20 | 28.44 | 23.81 | 2.08 | 7.92 | 6.25 | 21.45 | 86.80 | 57.50 | 46.32 | 6.67 | 20.00 | 23.33 | 40.10
+
+TABLE A2.T10.2
+Method | Training time (h) | GPU-hours | Relative cost
+OPD | 5.62 | 45.0 | 1.00\times
+MetaOPD | 11.06 | 88.5 | 1.97\times
+
+TABLE A3.E29
+ | R_{h}=\mathcal{L}_{\mathrm{out}}(\theta^{\prime}_{\mathrm{Uniform}};B)-\mathcal{L}_{\mathrm{out}}(\theta^{\prime}_{h};B). |  | (29)
+
+TABLE A4.E30
+ | c^{\circ}_{i,t}=c_{i,t}-\frac{1}{n_{i}}\sum_{s}m_{i,s}c_{i,s}, |  | (30)
+
+TABLE A4.T11.2
+(a) Agreement across independent reference batches
+Checkpoint | Student steps | Spearman | Sign agreement | Top-20% Jaccard
+Early | 232 | 0.975 | 0.993 | 0.958
+Middle | 464 | 0.976 | 0.993 | 0.961
+Final | 696 | 0.975 | 0.993 | 0.953
+(b) Weight alignment: Spearman correlation [95% CI]
+Checkpoint | c^{\circ}_{i,t} | \lvert c^{\circ}_{i,t}\rvert
+Early | 0.271\;[0.249,0.286] | 0.004\;[-0.116,0.169]
+Middle | 0.266\;[0.255,0.284] | 0.081\;[-0.093,0.190]
+Final | 0.267\;[0.246,0.278] | 0.082\;[-0.064,0.204]
+
+TABLE A4.E31
+ | \Delta L_{h}^{\mathrm{step}}=\frac{1}{32}\sum_{b=1}^{32}\frac{1}{2}\sum_{g=1}^{2}\left[\mathcal{L}_{\mathrm{out}}(\theta^{\prime}_{h,b,g};B_{b})-\mathcal{L}_{\mathrm{out}}(\theta;B_{b})\right], |  | (31)
+
+TABLE A4.EGx2
+ | \displaystyle\Delta L_{\mathrm{Learned}-\mathrm{Uniform}} | \displaystyle=\Delta L_{\mathrm{Learned}}^{\mathrm{step}}-\Delta L_{\mathrm{Uniform}}^{\mathrm{step}}, |  | (32)
+ | \displaystyle\Delta L_{\mathrm{Reweighted}-\mathrm{Learned}} | \displaystyle=\Delta L_{\mathrm{Reweighted}}^{\mathrm{step}}-\Delta L_{\mathrm{Learned}}^{\mathrm{step}}. |  | (33)
+
+TABLE A4.T12.2
+Checkpoint (step) | (a) Validation loss changes | (b) Paired contrasts
+Uniform | Learned | Reweighted | Learned - Uniform | 95% CI | Reweighted - Learned
+Early (232) | +0.74 | +0.09 | -3.32 | -0.65 | [-0.72,-0.59] | -3.41
+Middle (464) | +2.78 | +0.80 | -3.03 | -1.97 | [-2.16,-1.80] | -3.83
+Final (696) | +6.26 | +4.31 | +0.61 | -1.95 | [-2.13,-1.78] | -3.70
+
+TABLE A4.T13.2
+Input restriction | Spearman | Sign agreement | Top-20% Jaccard | 10^{3}\Delta L_{\mathrm{Reweighted}-\mathrm{Learned}}
+Position only | 0.978 | 0.994 | 0.962 | -3.56
+Teacher entropy | 0.978 | 0.994 | 0.961 | -3.92
+Log-prob. gap | 0.979 | 0.993 | 0.959 | -3.84
+Top-32 profiles | 0.975 | 0.992 | 0.960 | -3.30
+
+TABLE A5.Ex19
+ | \displaystyle\mathrm{Avg}=\tfrac{1}{5}\bigl( | \displaystyle\mathrm{GPQA}_{\mathrm{Avg@8}}+\mathrm{GPQA}_{\mathrm{Pass@8}}+\mathrm{MMLU}_{\mathrm{Pass@1}} | 
+ |  | \displaystyle+\mathrm{Alpaca}_{\mathrm{LC\text{-}WR}}+\mathrm{Alpaca}_{\mathrm{WR}}\bigr). | 

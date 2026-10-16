@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Dr. OPD · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">08 / 11 · 监督分配</p>
+<h1>Dr. OPD：用任务奖励决定，哪些老师纠正要多学</h1>
+<p class="original">Dr. OPD: Learning What to Follow for Optimal On-Policy Distillation of Large Language Models</p>
+<div class="meta"><span>Wang, Wang, Zhang et al.</span><span>2026-09-29 · 2609.38025v1</span><a href="https://arxiv.org/abs/2609.38025v1">论文 ↗</a><a href="原文PDF/08-dr-opd--2609.38025v1.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="dr-opd" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">老师会在很多 token 上纠正学生，但这些纠正未必同样有用。Dr. OPD 用结果奖励判断：加强某个位置的纠正，会不会帮助学生把题做对？有帮助就加权，没帮助就减权。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>关键计算和一句措辞，不必学得一样用力</h2><p>假设学生写错了一步乘法，又写了一句和老师不同的过渡语。普通 OPD 会在两个位置都要求学生接近老师。Dr. OPD 想区分：哪个纠正更有利于最终答案正确，哪个只是让文字更像老师。</p><p>算法不会人工标注“乘法重要、过渡语不重要”。它根据当前模型的梯度和整题奖励来算。下面用这两个位置作示意，解释权重究竟从哪里来。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>学生</td><td>先生成一组完整回答，再接受加权 OPD 更新。</td></tr><tr><td>老师</td><td>对这些学生回答逐位置给概率；老师参数不更新。</td></tr><tr><td>结果奖励</td><td>数学检查答案，代码执行测试；用它估计学生该往哪边更新。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;学生回答&quot;] --&gt; B[&quot;老师纠偏方向&quot;]
+ A --&gt; C[&quot;结果奖励方向&quot;]
+ B --&gt; D[&quot;计算 token credit&quot;]
+ C --&gt; D
+ D --&gt; E[&quot;加权 OPD 更新&quot;]</pre></figure><section class="method-block"><h3>1. 先收集学生回答和两类反馈</h3><p>对同一题让学生生成多条回答。老师读取这些回答的前缀，给每个已采样 token 一个概率；verifier 检查完整回答，给对错或任务得分。因此一条回答同时有逐 token 的老师评分和整条回答的结果奖励。</p><p>这两个反馈回答不同问题：老师评分告诉你这个 token 像不像老师会选的；结果奖励告诉你整条回答有没有做成任务。Dr. OPD 接下来要判断，朝老师靠近的方向是否也有利于任务奖励。</p></section><section class="method-block"><h3>2. 算出每个位置的老师纠正方向</h3><p>取老师概率的对数减去学生概率的对数，记作 dₜ。若老师给当前 token 的概率更高，dₜ 为正，就倾向于提高它；若老师给得更低，就倾向于降低它。再乘学生 log-probability 对参数的梯度，得到这个位置的纠正方向 gₜ。</p><p>这里说的方向，是“参数怎样改变，才会让学生更愿意或更不愿意输出这个 token”。所以不能只按词的表面含义决定重要性。同一个词出现在不同题目、不同前缀，或者不同阶段的学生里，计算出的纠正方向都可能不同。</p></section><section class="method-block"><h3>3. 用结果奖励算另一个方向，再比较两者</h3><p>根据同一题各条回答的奖励差异，构造一个能提高学生任务表现的更新方向。做对的回答和做错的回答贡献不同，和 GRPO 用组内好坏来学习的思路相同。之后把这个奖励方向与每个 gₜ 做内积，得到 token credit。</p><p>正 credit 表示这两个方向在当前计算里相互支持，可以多听这个位置的老师；负 credit 表示更强地模仿它可能妨碍奖励改善，应当少听一点。论文理论在一次普通 OPD 更新之后评价奖励梯度，实装为节约计算，用当前学生已有回答来近似。</p><div class="equation" id="equations"><h4>从两个方向得到权重</h4><div class="math">$$\begin{aligned}c_t&amp;=\langle g_t,\widehat r\rangle\\w_t&amp;=\operatorname{clip}(1+\lambda\widetilde c_t,w_{min},w_{max})\end{aligned}$$</div><p>r̂ 是估计的奖励改善方向，cₜ 是两方向的内积。实际先把 credit 按 RMS 尺度缩放成 c̃ₜ，再乘 λ、加到一上，最后限制上下界。</p></div></section><section class="method-block"><h3>4. 按权重更新学生，老师本身不变</h3><p>原来各位置都按相同力度做 OPD，现在把每个位置的老师信号乘 wₜ。例如缩放后的 credit 是 +1、λ 是 0.4，那么未触发截断时权重为 1.4；credit 为 −1 时是 0.6。两个位置都还能学，但力度不同。</p><p>因此负 credit 并不意味着把老师建议完全反过来训练。主配置通过正的权重下界保留一定监督。更新完学生后，下一轮重新生成回答、重新计算 credit，权重也随之变化；没有一个额外网络永久记住每种 token 的权重。</p></section><section class="method-block"><h3>5. 怎样算这么多 token，而不保存巨大梯度表</h3><p>如果每个 token 都保存一份完整参数梯度，大模型会占很多内存。实际上这里只需要“这个梯度沿同一个奖励方向的投影”。JVP 可以输入那个参数方向，一起算出所有 token 概率沿这个方向的变化率，再与 dₜ 组合成 credit。</p><p>公开代码中，jvp_influence.py 计算方向导数，credit_gate.py 做缩放和权重截断。其余训练代码把权重用于 OPD。工程实现还处理有效 token、参与加权的位置以及优化器状态；下方保留了具体代码链接，读完流程后可以再看。</p></section><p class="source-line"><a href="https://arxiv.org/html/2609.38025v1#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>它和 OPD loss 加 RL loss 有什么区别？</h3><p>直接相加会让两份损失各自贡献梯度。Dr. OPD 先用奖励判断哪些老师纠正值得加强，再做加权 OPD。结果奖励在这里控制的是听老师的力度，不能把它当成换个系数的普通 loss 相加。</p></section><section class="practical-detail"><h3>一组回答全错时，还能算出好权重吗？</h3><p>如果结果奖励都一样，组内比较提供的方向很弱，credit 就难以可靠区分有用纠正。论文里更弱 Base 学生的数学收益也较小。这个方法需要一定可用奖励，不能单靠加权解决所有零成功冷启动。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">Qwen3-1.7B 学生</th><th scope="col">数学 Avg@16</th><th scope="col">代码 Avg@4</th></tr></thead><tbody><tr><td>普通 OPD</td><td>25.3</td><td>43.4</td></tr><tr><td>OPD + GRPO</td><td>25.6</td><td>43.7</td></tr><tr><td>Dr. OPD</td><td>35.0</td><td>48.4</td></tr><tr><td>4B 老师（参照）</td><td>34.1</td><td>52.7</td></tr></tbody></table></div><p class="note">原文 Table 1。数学平均五项，代码平均三项；数学超过老师，代码仍低于老师。 <a href="https://arxiv.org/html/2609.38025v1">原文表格 ↗</a></p><p>表中的 1.7B 学生，数学平均从普通 OPD 的 25.3 提升到 35.0，而直接 OPD+GRPO 是 25.6。这组结果支持作者关心的具体问题：奖励如何参与蒸馏，比仅仅把奖励放进训练更重要。</p><p>它在这组数学平均上超过 4B 老师，但代码平均仍低于老师，所以不要把结果读成小模型全面超过大模型。理论也只是特定条件下的局部更新结论；实际 credit 使用近似，不能保证每一次加权更新都提高分数。</p><p class="source-line"><a href="https://arxiv.org/html/2609.38025v1#S5">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>MetaOPD 也改 token 权重，但它训练一个小网络，并用参考答案上的预测损失教这个网络。Dr. OPD 直接用本轮任务奖励算权重，没有这个额外网络。</p><details class="project-more"><summary>实验对照建议</summary><p>它已把 outcome reward 转成监督的局部信用。若延伸到多步独立 RL，需要说明信用如何穿过后续策略变化，以及长反馈是否比当前局部估计更值得付费。</p></details></section>
+<p class="endnote">先问老师想纠正什么，再问这种纠正是否有助于奖励，最后决定学多大力度。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2609.38025v1#S3">双层目标与闭式权重 ↗</a><a href="https://arxiv.org/html/2609.38025v1#S4">实际估计器 ↗</a><a href="https://arxiv.org/html/2609.38025v1#S5">实验 ↗</a><a href="sources/08-dr-opd/readable.txt">本地全文文字</a></div><p><a href="https://github.com/zywang0701/Dr-OPD">作者代码仓库 ↗</a> · 作者仓库提供数学训练入口；代码生成实验的专用启动脚本未包含在此版本。</p><div class="code-item"><h3>计算训练权重</h3><p>RMS 缩放后，通过上下界限制权重；未选中的位置保持权重一。</p>
+<pre class="source"><code>    lam = float(lam_fixed) if lam_fixed and lam_fixed &gt; 0 else min(lam_hi, lam_lo, lam_cap)   # fixed lambda or clip budgets
+    w = torch.where(S, (1.0 + lam * z).clamp(float(w_min), w_max), torch.ones_like(z))
+    w = w * mask</code></pre><a class="code-link" href="https://github.com/zywang0701/Dr-OPD/blob/07f26d9cecd77f1a3ed4003b2187fbcbd5ad01e3/Dropd/verl/verl/workers/actor/credit_gate.py#L251">Dropd/verl/verl/workers/actor/credit_gate.py:251 · 07f26d9</a></div><div class="code-item"><h3>计算 token 的方向导数</h3><p>对 token 概率函数执行 JVP，避免保存每个位置的完整参数梯度。</p>
+<pre class="source"><code>            tang = {n: u_full[n] for n in params}
+            _, D = jvp(f, (params,), (tang,))
+            if idx is None:
+                out[b, :n_resp] = D.float()</code></pre><a class="code-link" href="https://github.com/zywang0701/Dr-OPD/blob/07f26d9cecd77f1a3ed4003b2187fbcbd5ad01e3/Dropd/verl/verl/workers/actor/jvp_influence.py#L173">Dropd/verl/verl/workers/actor/jvp_influence.py:173 · 07f26d9</a></div></details><nav class="pager" aria-label="相邻论文"><a href="07-pear.html"><small>上一篇</small>PEAR</a><a href="09-op-short.html"><small>下一篇</small>OP-Short</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

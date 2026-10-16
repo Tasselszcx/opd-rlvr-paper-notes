@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>PEAR · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">07 / 11 · 训练顺序</p>
+<h1>PEAR：根据后续示范是否好学，调整每一步的训练权重</h1>
+<p class="original">Good SFT Optimizes for SFT, Better SFT Prepares for Reinforcement Learning</p>
+<div class="meta"><span>Zhang, Xu, Wang et al.</span><a href="https://proceedings.mlr.press/v306/zhang26hd.html">ICML 2026 ↗</a><span>2026-05-28 · 2602.01058v2</span><a href="https://arxiv.org/abs/2602.01058v2">论文 ↗</a><a href="原文PDF/07-pear--2602.01058v2.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="pear" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">数据还是原来的离线示范，PEAR 只改变每个位置学多大力度。它比较学生与数据来源模型的概率，降低那些后续整段示范对学生很难继续的位置的权重。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>同样写“因此”，后面接的内容可能完全不同</h2><p>假设两条示范都写到“因此”。第一条后面接学生熟悉的代数推导，第二条后面接学生几乎不会使用的一串构造。学生对“因此”这个词本身的概率相同，但接下来的两条路很不一样。</p><p>PEAR 会查看这个位置之后的整段示范，比较它在学生和来源模型下有多容易出现，再决定当前位置学多大力度。它希望这样训练出来的学生，后面做 RL 时更容易继续学习。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>离线示范</td><td>固定的题目与回答，主实验由 Qwen3-8B 生成并验证。</td></tr><tr><td>两份概率</td><td>数据来源模型的 token 概率，以及当前学生对同一离线文本的概率。</td></tr><tr><td>更新与评价</td><td>前一段做加权 SFT 或离线 KD，后一段接同样 RL 比较结果。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;离线示范与来源概率&quot;] --&gt; B[&quot;计算学生和来源概率比&quot;] --&gt; C[&quot;后缀或整段权重&quot;] --&gt; D[&quot;加权 SFT&quot;] --&gt; E[&quot;同配置 RL 评价&quot;]</pre></figure><section class="method-block"><h3>1. 先让两个模型读取同一条离线回答</h3><p>取已有的题目和示范回答，不让学生另写一条。对回答中每个位置，数据来源模型和学生都看到相同前文，计算这个示范 token 的概率。来源模型概率可以提前保存；学生概率随自己的参数变化重新计算。</p><p>这里的来源模型是生成数据的策略，不是一个假设的最优模型。若数据来自拿不到概率的闭源服务，论文还研究了用代理模型估计来源概率，但那样得到的概率比只是近似。实际使用时要先弄清楚示范是从哪里来的。</p></section><section class="method-block"><h3>2. 把学生概率除以来源概率</h3><p>如果来源模型给一个示范 token 概率 0.8，而学生只给 0.4，那么比率是 0.5。意思是：和来源模型相比，当前学生更不容易写出这一步。若学生概率更高，比率就大于一。</p><p>这个比率本身并没有判断示范对不对。正确但新颖的知识也可能在学生下概率很低。PEAR 用它衡量示范与当前学生的关系，再通过后续实验检查这种重加权是否有利，不能把概率低直接解释成内容错误。</p></section><section class="method-block"><h3>3. 为当前位置计算后缀权重</h3><p>逐 token 版本不只使用当前位置的比率，而把它后面各位置的比率相乘。若后面三个比率都是 0.5，先忽略折扣，乘积就是 0.125，于是当前位置的损失会被减弱。作者想减少对那些学生很难继续完成的示范路径的模仿。</p><p>公式还按剩余长度乘一个折扣。越长的序列连乘越容易不稳定，所以实际在 log 空间相加，并对单步比率和最终权重截断。纸面连乘是核心想法，带截断的计算才是实际训练配方。</p><div class="equation" id="equations"><h4>当前位置看的是后面哪些词</h4><div class="math">$$\begin{aligned}\Delta_j&amp;=\frac{\pi_S(y_j\mid x,y_{&lt;j})}{\pi_B(y_j\mid x,y_{&lt;j})}\\G_t&amp;=\gamma^{T-t}\prod_{j=t+1}^{T}\Delta_j\end{aligned}$$</div><p>B 是数据来源模型，S 是学生，T 是回答长度。第 t 个位置的权重用 j&gt;t 的后续示范计算，γ 控制折扣。</p></div></section><section class="method-block"><h3>4. 把这个数乘到原损失上，再更新学生</h3><p>如果原来某位置的 SFT 交叉熵是 ℓₜ，现在训练的是 Gₜ×ℓₜ。原来的监督目标不变，只改变每个位置的力度。权重会停止梯度，因此学生不会沿着“怎样改变 Gₜ”这条额外路径优化。</p><p>这套做法没有额外的教师网络，也不会为了算一个权重先跑一段学生 RL。它还可以作用于离线 KD 的 token 损失。论文另外给出负样本扩展，用序列权重降低验证失败回答的概率；比较时需要分清有没有使用这部分数据。</p></section><section class="method-block"><h3>5. 选权重版本，然后把后续 RL 接完</h3><p>论文有三个版本。序列版把整条回答的比率相乘，所有位置共用一个数；token 版每个位置使用自己的后缀；block 版把相邻 token 分块，同一块使用块末之后的后缀。它们在细粒度和稳定性之间作不同选择。</p><p>离线训练完后，把这些学生和普通 SFT 学生都送进相同 RL。此时比较的是完整训练的最终表现。后续 RL 只用于验证准备效果，不会作为外层奖励直接训练 PEAR 的权重规则。</p></section><p class="source-line"><a href="https://arxiv.org/html/2602.01058v2#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>这和只看当前 token 的权重有什么区别？</h3><p>回到“因此”的例子：单步权重看到两个当前词的比率一样，就给同样力度；后缀权重还看后面能否继续。论文专门比较了同样稳定化的单步比率，结果说明随便加一个概率权重并不足够。</p></section><section class="practical-detail"><h3>它为什么适合作为便宜基线？</h3><p>它保留现成的 SFT 数据与训练流程，额外主要是来源概率和权重计算，不用展开真实或虚拟的多步学生训练。不过概率预计算、代理模型评分和示范生成仍要花钱，不能把这些前置费用省略。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">Qwen3-Base · 数学平均</th><th scope="col">SFT → RL</th><th scope="col">单步比率 → RL</th><th scope="col">PEAR → RL</th></tr></thead><tbody><tr><td>0.6B</td><td>9%</td><td>10%</td><td>12%</td></tr><tr><td>1.7B</td><td>23%</td><td>18%</td><td>26%</td></tr><tr><td>4B</td><td>39%</td><td>38%</td><td>44%</td></tr><tr><td>8B</td><td>36%</td><td>30%</td><td>41%</td></tr></tbody></table></div><p class="note">arXiv v2 Table 3，同一表内的平均准确率对照。单步比率只看当前位置；PEAR B=1 看当前位置之后的后缀。 <a href="https://arxiv.org/html/2602.01058v2">原文表格 ↗</a></p><p>表中单步比率在几个规模上还低于普通 SFT，而 PEAR 后缀版提高了后续 RL 平均分。这支持作者的具体选择：看当前位置之后的整段示范，而不是只看当前词好不好学。</p><p>序列级这个更简单的版本也表现不错。因此，你要研究可学习 gate 时，不应只和均匀 SFT 比，还要比较序列、token 和分块这些便宜版本。所有方法接相同后续 RL，才容易看清新增复杂度带来了多少收益。</p><p class="source-line"><a href="https://arxiv.org/html/2602.01058v2#S4.T3">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>MetaOPD 会根据一次临时学生更新的结果学习权重网络；PEAR 直接按预设的概率比规则算权重。两者都重分训练力度，但算权重的过程和费用差很多。</p><details class="project-more"><summary>实验对照建议</summary><p>保留序列级、后缀 token 级和分块 PEAR 三个便宜版本，并明确来源概率成本。你的复杂教学策略要展示超过这种预设重加权规则的增益。</p></details></section>
+<p class="endnote">PEAR 不换示范答案，只根据后续示范与学生的关系，改变每一步学多大力度。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2602.01058v2#S3">后缀权重与算法 ↗</a><a href="https://arxiv.org/html/2602.01058v2#S4">数学与逻辑实验 ↗</a><a href="https://arxiv.org/html/2602.01058v2#S4.T3">单步权重对照 ↗</a><a href="sources/07-pear/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="06-metaopd.html"><small>上一篇</small>MetaOPD</a><a href="08-dr-opd.html"><small>下一篇</small>Dr. OPD</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

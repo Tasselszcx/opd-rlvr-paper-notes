@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>RISE · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">01 / 11 · 老师来源</p>
+<h1>RISE：把刚才的 RL 更新放大，做成老师</h1>
+<p class="original">RISE: Recursive Improvement via Self-Extrapolating Policy Distillation</p>
+<div class="meta"><span>Li, Yavuz, Joty</span><span>2026-09-04 · 2609.05295v1</span><a href="https://arxiv.org/abs/2609.05295v1">论文 ↗</a><a href="原文PDF/01-rise--2609.05295v1.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="rise" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">学生先做一次 RL 更新。把新旧模型的变化再向前放大一点，得到临时老师；让学生学这个老师的预测，然后进入下一轮。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>把参数从 10 更新到 11，再算出 11.2</h2><p>先只看一个参数，假设它原来是 10，一次 RL 更新后变成 11。RISE 取一个系数 1.2，算出 10 + 1.2 × (11 − 10) = 11.2。这只是帮助理解的数字例子，真实模型会同时处理所有参数。</p><p>算出来的 11.2 属于临时老师。学生不会直接被替换成这个老师，而是从更新后的 11 出发，学习老师给出的 token 概率。论文希望用这种方式多利用一次已经发生的奖励更新。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>当前学生</td><td>生成回答、接受 RL 更新，再接受蒸馏更新。</td></tr><tr><td>旧模型或 EMA</td><td>作为比较基准，提供“刚才改变了多少”。</td></tr><tr><td>临时老师</td><td>由新旧模型计算出来，本轮蒸馏时保持固定。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;旧锚点&quot;] --&gt; B[&quot;奖励更新后的模型&quot;] --&gt; C[&quot;沿更新方向外推&quot;] --&gt; D[&quot;合成老师&quot;] --&gt; E[&quot;蒸馏回学生&quot;]
+ E -. 下一轮 .-&gt; B</pre></figure><section class="method-block"><h3>1. 先照常做一次 RL 更新</h3><p>当前学生对一批题生成回答，verifier 检查最后答案，再用 GRPO 等方法更新学生。保存更新前后的模型，就知道这次根据奖励学习，让参数往哪里移动了。RISE 的后续操作建立在这次真实更新之上。</p><p>这一步很关键：如果只拿两个任意模型相减，差值不一定有利于任务。这里使用同一个模型训练过程中的变化，因为这次变化至少来自当前任务的奖励。若奖励错误或者被模型钻了空子，后面的放大也会受到影响。</p></section><section class="method-block"><h3>2. 参数版本：把新旧参数差乘上一个系数</h3><p>参数版本先算新模型减旧基准的差，再把这份差乘 β，最后加回旧基准。β 大于一时，老师位于新模型再往前一点的位置；β 等于一时，老师就是更新后的学生。主配置把 β 从 1.2 逐渐降到一。</p><p>旧基准可以是上一轮 checkpoint，也可以是近期参数的滑动平均，也就是 EMA。EMA 不会只追着最近一次更新跑，能让计算老师时用到的变化更平滑。论文不同模型家族采用的基准设置不完全一样。</p><div class="equation" id="equations"><h4>参数老师怎样算出来</h4><div class="math">$$\theta_T=\theta_{old}+\beta(\theta_{new}-\theta_{old})$$</div><p>θold 是旧基准，θnew 是刚做完 RL 的学生，θT 是老师。先看两者差了多少，再把这个变化放大；β 控制放大程度。</p></div></section><section class="method-block"><h3>3. 概率版本：不改参数，直接放大预测的变化</h3><p>另一种实现让新旧模型都对同一段学生回答评分。在某个位置，旧模型给 A 的概率较低，新模型因为刚才的 RL 更新更偏向 A，就继续增强这种变化；对本次更新降低的选项则做相反处理。计算在 log-probability 上进行，最后归一化成一份概率分布。</p><p>这样得到的是每个位置的老师目标，不需要真的保存一套外推后的老师参数。它与参数版本目标相近，但神经网络是非线性的，不能认为两种计算一定给出一样的概率。论文把两种实现分别做了实验。</p></section><section class="method-block"><h3>4. 让学生学习临时老师，而不是直接采用它</h3><p>把临时老师固定下来，让刚完成 RL 的学生在同一批回答上计算预测，通过蒸馏缩小师生差别。老师可能放大了有用变化，也可能放大噪声，所以作者选择让学生逐步学习，而不是直接把外推参数当成下一轮学生。</p><p>实际实验用 JSD 计算概率分布差别。为减少词表开销，通常保留一百个主要 token，再把其他 token 的概率合成一个尾桶。尾桶的作用是把剩余概率也算进去，而不是把这些词全部当成概率零。代码任务使用更小的 top-K。</p></section><section class="method-block"><h3>5. 用蒸馏后的学生开始下一轮</h3><p>本轮 RL 与蒸馏复用同一批学生回答，因此蒸馏阶段不用再生成一整批新回答。但老师评分、学生前向和反向传播仍然要花计算。复用的回答来自本轮 RL 更新前的学生，相对蒸馏时的学生已有一点变化。</p><p>完成蒸馏后，保留学生，丢弃这一轮的临时目标。下一轮由新学生重新生成回答，再做 RL、再造老师、再蒸馏。老师因此每轮都跟着学生变化，不会一直把学生拉向一个固定外部模型。</p></section><p class="source-line"><a href="https://arxiv.org/html/2609.05295v1#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>为什么不只把 RL 学习率调大？</h3><p>调大学习率直接扩大参数更新。RISE 先把放大后的模型变成逐 token 的预测目标，再通过蒸馏学习。两者经过的损失和梯度计算不同。是否真的比调大学习率更有用，需要实验对照，不能只凭这个解释认定。</p></section><section class="practical-detail"><h3>它有没有给学生额外知识？</h3><p>这套流程没有引入外部强老师或额外参考推理。它重新使用了本模型根据任务奖励产生的变化。如果原始奖励没有教出有用方向，单靠外推不会自动产生正确知识。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">任务 / 模型</th><th scope="col">GRPO</th><th scope="col">RISE</th></tr></thead><tbody><tr><td>数学均分 · Qwen3-8B</td><td>60.0</td><td>62.7（参数）</td></tr><tr><td>数学均分 · OLMo3-7B</td><td>47.6</td><td>56.4（logit）</td></tr><tr><td>ALFWorld · Qwen2.5-3B</td><td>75.0</td><td>84.4（参数）</td></tr></tbody></table></div><p class="note">原文 Tables 1、3；各行是不同实验，均为百分制结果。这里明确标出每行使用的 RISE 版本。 <a href="https://arxiv.org/html/2609.05295v1">原文表格 ↗</a></p><p>数学和 agent 实验都给出了提升，表中列出几组直接对照。参数外推和概率外推各有表现较好的配置，所以表里标出了使用哪一种，不能把不同配置的最好数值混成一个固定方法的成绩。</p><p>作者还检查了拿掉 RL、直接使用外推模型以及改变外推幅度等情况。这些消融是为了确认完整的“先 RL，再造老师，再蒸馏”是否有用。整体训练墙钟约为 GRPO 的 1.3–1.6 倍；没有额外 rollout，不等于没有额外成本。</p><p class="source-line"><a href="https://arxiv.org/html/2609.05295v1#S5">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>与 NPD 相比，RISE 不先花许多步训练出更晚 checkpoint。与 Sequential 相比，它没有一个始终固定的外部老师，所以两篇的训练结论不能直接互相否定。</p><details class="project-more"><summary>实验对照建议</summary><p>RISE 每轮通过奖励更新重新构造老师，没有持久的外层教学策略。比较时区分参数外推的自举与学习教学动作，并固定额外评分、反传和 rollout 成本。</p></details></section>
+<p class="endnote">RISE 每轮都做三件事：RL 更新学生、沿更新变化算老师、把老师预测蒸馏回学生。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2609.05295v1#S3">外推与蒸馏 ↗</a><a href="https://arxiv.org/html/2609.05295v1#S4">主要结果 ↗</a><a href="https://arxiv.org/html/2609.05295v1#S5">限制 ↗</a><a href="sources/01-rise/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="index.html"><small>回到总览</small>论文总览</a><a href="02-soar.html"><small>下一篇</small>SOAR</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

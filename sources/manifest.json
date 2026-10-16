@@ -1,0 +1,128 @@
+{
+  "outputs": [
+    "index.html",
+    "01-rise.html",
+    "02-soar.html",
+    "03-near-future.html",
+    "04-sequential.html",
+    "05-opw.html",
+    "06-metaopd.html",
+    "07-pear.html",
+    "08-dr-opd.html",
+    "09-op-short.html",
+    "10-rl-before-rl.html",
+    "11-atesd.html"
+  ],
+  "papers": [
+    {
+      "id": "rise",
+      "file": "01-rise.html",
+      "name": "RISE",
+      "title": "RISE: Recursive Improvement via Self-Extrapolating Policy Distillation",
+      "version": "2609.05295v1",
+      "source": "https://arxiv.org/html/2609.05295v1",
+      "source_directory": "sources/01-rise",
+      "main_hanzi": 1626
+    },
+    {
+      "id": "soar",
+      "file": "02-soar.html",
+      "name": "SOAR",
+      "title": "Teaching Models to Teach Themselves: Reasoning at the Edge of Learnability",
+      "version": "2601.18778v3",
+      "source": "https://arxiv.org/html/2601.18778v3",
+      "source_directory": "sources/02-soar",
+      "main_hanzi": 1681
+    },
+    {
+      "id": "near-future",
+      "file": "03-near-future.html",
+      "name": "NPO / NPD / AutoNPO",
+      "title": "Learning from the Near Future: Temporal Self-Distillation for RLVR",
+      "version": "2604.20733v2",
+      "source": "https://arxiv.org/html/2604.20733v2",
+      "source_directory": "sources/03-near-future",
+      "main_hanzi": 1620
+    },
+    {
+      "id": "sequential",
+      "file": "04-sequential.html",
+      "name": "Sequential Beats Joint",
+      "title": "Sequential Beats Joint: On the Interplay between On-Policy Distillation and RLVR",
+      "version": "2609.04108v2",
+      "source": "https://arxiv.org/html/2609.04108v2",
+      "source_directory": "sources/04-sequential",
+      "main_hanzi": 1610
+    },
+    {
+      "id": "opw",
+      "file": "05-opw.html",
+      "name": "OPW",
+      "title": "From Imitation to Reward Discovery: On-Policy Warmup for Agentic RL",
+      "version": "2609.39436v1",
+      "source": "https://arxiv.org/html/2609.39436v1",
+      "source_directory": "sources/05-opw",
+      "main_hanzi": 1709
+    },
+    {
+      "id": "metaopd",
+      "file": "06-metaopd.html",
+      "name": "MetaOPD",
+      "title": "MetaOPD: Meta-Learned Token Weighting for On-Policy Distillation",
+      "version": "2610.11989v1",
+      "source": "https://arxiv.org/html/2610.11989v1",
+      "source_directory": "sources/06-metaopd",
+      "main_hanzi": 1648
+    },
+    {
+      "id": "pear",
+      "file": "07-pear.html",
+      "name": "PEAR",
+      "title": "Good SFT Optimizes for SFT, Better SFT Prepares for Reinforcement Learning",
+      "version": "2602.01058v2",
+      "source": "https://arxiv.org/html/2602.01058v2",
+      "source_directory": "sources/07-pear",
+      "main_hanzi": 1639
+    },
+    {
+      "id": "dr-opd",
+      "file": "08-dr-opd.html",
+      "name": "Dr. OPD",
+      "title": "Dr. OPD: Learning What to Follow for Optimal On-Policy Distillation of Large Language Models",
+      "version": "2609.38025v1",
+      "source": "https://arxiv.org/html/2609.38025v1",
+      "source_directory": "sources/08-dr-opd",
+      "main_hanzi": 1621
+    },
+    {
+      "id": "op-short",
+      "file": "09-op-short.html",
+      "name": "OP-Short",
+      "title": "A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training",
+      "version": "2607.04574v2",
+      "source": "https://arxiv.org/html/2607.04574v2",
+      "source_directory": "sources/09-op-short",
+      "main_hanzi": 1703
+    },
+    {
+      "id": "rl-before-rl",
+      "file": "10-rl-before-rl.html",
+      "name": "RL Starts before RL",
+      "title": "RL Starts before RL: On Policy Distillation for Better Reinforcement Learning",
+      "version": "2609.28145v2",
+      "source": "https://arxiv.org/html/2609.28145v2",
+      "source_directory": "sources/10-rl-before-rl",
+      "main_hanzi": 1630
+    },
+    {
+      "id": "atesd",
+      "file": "11-atesd.html",
+      "name": "ATESD",
+      "title": "Adaptive Teacher Exposure for Self-Distillation in LLM Reasoning",
+      "version": "2605.11458v3",
+      "source": "https://arxiv.org/html/2605.11458v3",
+      "source_directory": "sources/11-atesd",
+      "main_hanzi": 1610
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>OP-Short · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">09 / 11 · 教学与成本</p>
+<h1>OP-Short：学生先走，老师接手几步，把这几步拿来训练</h1>
+<p class="original">A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training</p>
+<div class="meta"><span>Ye, Cheng, Lu et al.</span><a href="https://web.stanford.edu/~bayati/index.html">NeurIPS 2026 · 作者主页确认 ↗</a><span>2026-08-29 · 2607.04574v2</span><a href="https://arxiv.org/abs/2607.04574v2">论文 ↗</a><a href="原文PDF/09-op-short--2607.04574v2.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="op-short" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">让学生自己执行任务，随机选一个位置交给老师。老师只继续少量交互步，这些短续写都保留，再用它们训练学生。论文比较这样花老师预算是否更划算。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>学生找错目录，老师只演示接下来几步</h2><p>假设一个代码 agent 要修文件，却进入了错误目录。老师在此时接手，可以先确认目录、查看文件，再开始处理正确文件。OP-Short 只收集指定数量的老师交互轮次，不一定等老师把整个任务做完。</p><p>这段短示范会和当时的学生历史一起保存，成为监督训练数据。下一次遇到类似局面，学生就有机会自己生成这些动作。下面的场景只是方法示意，实际论文还研究了搜索问答和文本环境任务。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>前缀学生</td><td>先用完整老师示范做 BC，随后固定它来收集学生轨迹。</td></tr><tr><td>老师</td><td>在选中的学生状态接管环境，最多继续 K 个交互轮次。</td></tr><tr><td>最终学生</td><td>从原始 base 出发，用 BC 数据加短老师续写重新做 SFT。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;BC 训练前缀学生&quot;] --&gt; B[&quot;学生轨迹随机交接&quot;] --&gt; C[&quot;老师接管 K 轮&quot;] --&gt; D[&quot;保留全部短续写&quot;] --&gt; E[&quot;base 上重训 BC + OP&quot;]</pre></figure><section class="method-block"><h3>1. 先训练一个能开始做任务的学生</h3><p>拿一部分老师从头做任务的完整示范，对 base 学生做行为克隆，也就是 BC。这一步得到用于收集轨迹的学生。它不需要已经很强，但要能走出一些有意义的中间状态，老师接手时才有具体东西可教。</p><p>之后用这个学生做训练任务，记录动作和环境回复。主流程在这一轮数据收集期间固定该学生，不会每收一条数据就立刻更新它。这个初始 BC 的训练成本也应计入整个方法。</p></section><section class="method-block"><h3>2. 在学生实际走过的轨迹里抽一个交接点</h3><p>主 OP-Short 先得到一条学生轨迹，再从它的有效轮次里均匀抽取位置。到这个位置之前，行动都由学生完成；老师接手时看到的是学生留下的历史和环境状态，包括此前发生的错误。</p><p>抽样单位要明确。若先等概率选轨迹，再在轨迹内部选位置，每条轨迹总权重相同；若把所有 turns 混在一起选，长轨迹会更常被选中。论文把这个差别写清楚，因为它会直接改变老师接触到哪些学生状态。</p></section><section class="method-block"><h3>3. 让老师继续 K 个 turns，把续写留下</h3><p>K 表示 assistant 的交互轮数，不是 token 数。一次 turn 可以有思考、动作或工具调用，文字长度也可能很不同。任务提前结束就停止，否则到 K 轮就截断。老师会真的与环境交互，所以第二个老师动作可能依赖第一个动作带来的新观察。</p><p>OP-Short 保留这些短续写，不按整段最后成功与否过滤。它想利用的是学生位置上的短指导，即使 K 轮内还没完成任务，也可能包含有用的下一步。K 越长，每个起点花的老师预算越多，能覆盖的不同起点就可能越少。</p></section><section class="method-block"><h3>4. 只训练老师续写，从原始 base 重新做 SFT</h3><p>一条样本的输入是学生造成的上下文，监督目标是老师接手后的 assistant token。学生之前的输出和环境回复都只作为条件，不作为需要学生模仿的老师答案。这样训练的是“遇到这个局面时，老师接下来怎样做”。</p><p>主 BC+OP 配方把这些数据与原来的 BC 数据合并，再从原始 base 重新训练。它不是默认在负责收集前缀的 BC 学生上继续追加训练。复现时若漏掉这个重初始化细节，就改变了学生经历的更新量和训练流程。</p><div class="equation" id="equations"><h4>最终训练的是哪一份学生</h4><div class="math">$$\pi_{final}=\operatorname{SFT}(\pi_0,D_{BC}\cup D_{OP})$$</div><p>π₀ 是原始 base，DBC 是完整示范，DOP 是学生历史加老师短续写。负责生成学生历史的 BC checkpoint 用于收集数据，最终训练按这里重新开始。</p></div></section><section class="method-block"><h3>5. 按两种费用比较短续写与其他办法</h3><p>一种费用是老师总共生成了多少，包括后来丢掉的内容；另一种是最终保留下来、进入每轮 SFT 的老师 token 有多少。成功过滤可以减少第二种费用，却不能抹掉已经支付的生成费用。</p><p>例如花预算生成了六十个 turns，只保留二十个，训练集确实变小了，但老师依然生成过六十个。OP-Short 与长续写、成功过滤、只选择学生失败任务等方案比较时，需要分别按这两条费用轴看结果。</p></section><p class="source-line"><a href="https://arxiv.org/html/2607.04574v2#S2">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>为什么不一直让老师做完？</h3><p>同样预算下，可以在少量学生状态上给很长示范，也可以在更多学生状态上各给几步。若局部几步已经能教会恢复动作，后面长长的老师轨迹可能不如多覆盖几个学生错误。但需要长规划才能恢复的任务，可能仍需要更大的 K。</p></section><section class="practical-detail"><h3>它和 OPW 的老师指导一样吗？</h3><p>OP-Short 让老师实际生成并执行一段续写，再把这段作为 SFT 标签。OPW 的主做法是在已收集的学生输出位置上给老师目标。它们都利用学生到达的状态，但生成数据和构造损失的方式不同。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">Terminal-Bench-Dev 配置</th><th scope="col">最终 SFT 数据 / RL</th><th scope="col">得分 %</th></tr></thead><tbody><tr><td>Pure BC</td><td>10% BC / 无 RL</td><td>11.9</td></tr><tr><td>Pure BC</td><td>100% BC / 无 RL</td><td>13.8</td></tr><tr><td>OT-Agent 报告基线</td><td>100% BC / 720 RL 任务</td><td>17.3</td></tr><tr><td>OP-Short · K=3</td><td>5% BC + 5% OP / 无 RL</td><td>19.1</td></tr></tbody></table></div><p class="note">arXiv v2 Appendix Table 5，三次尝试平均；17.3 来自 OT-Agent 报告。OP-Short 的前缀模型先使用 10% BC 训练，表中 5%+5% 不是全流程成本比例。 <a href="https://arxiv.org/html/2607.04574v2">原文表格 ↗</a></p><p>HotpotQA 的 K 扫描中，三轮可以优于更长续写；ALFWorld 的相应比较则更偏好五轮。因此不能记成固定“三步最好”。论文还发现 BC 与学生状态数据需要适当混合，完全只用一边未必最优。</p><p>Terminal-Bench 的表说明少量短续写已经是强基线，但数据占比不是总费用占比。那个前缀学生先用过百分之十的 BC 数据，老师还生成了新内容；不能把最后的百分之五加百分之五写成只花了十分之一全部算力。</p><p class="source-line"><a href="https://arxiv.org/html/2607.04574v2#A6">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>你如果要学习一个 gate，最直接的对照就是随机交接位置加固定 K。保持老师总生成量、保留监督量和后续 RL 一致，再看学出来的选择能否稳定提高最终成绩。</p><details class="project-more"><summary>实验对照建议</summary><p>将随机位置 + 固定 K 的无过滤短续写作为强基线。分别核算所有教师生成、保留监督、前缀模型训练和后续 RL，检验 learned gate 的收益是否覆盖额外成本。</p></details></section>
+<p class="endnote">先花少量老师动作纠正更多学生状态，再判断更长、更精细的指导是否值得。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2607.04574v2#S2">数据构造和成本 ↗</a><a href="https://arxiv.org/html/2607.04574v2#S3">三类 agent 实验 ↗</a><a href="https://arxiv.org/html/2607.04574v2#A6">Terminal-Bench 详细配置 ↗</a><a href="sources/09-op-short/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="08-dr-opd.html"><small>上一篇</small>Dr. OPD</a><a href="10-rl-before-rl.html"><small>下一篇</small>RL Starts before RL</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

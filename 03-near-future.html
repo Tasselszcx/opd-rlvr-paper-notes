@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>NPO / NPD / AutoNPO · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">03 / 11 · 老师来源</p>
+<h1>NPO / NPD / AutoNPO：用后面的 checkpoint 教前面的模型</h1>
+<p class="original">Learning from the Near Future: Temporal Self-Distillation for RLVR</p>
+<div class="meta"><span>Qin, Yang, Si et al.</span><span>2026-10-01 · 2604.20733v2</span><a href="https://arxiv.org/abs/2604.20733v2">论文 ↗</a><a href="原文PDF/03-near-future--2604.20733v2.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="near-future" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">先把模型往后训练，保存一个更强的版本；再恢复较早的模型，让后面的版本教它。NPO 传成功回答，NPD 传 token 概率，AutoNPO 决定什么时候回滚。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>训练到第 40 步，再回到第 20 步</h2><p>设想第 20 步的学生做不出一类题，第 40 步的自己已经能做出一些。保存第 40 步模型，再把学生恢复到第 20 步。接下来训练的学生仍然较弱，但可以使用第 40 步模型提供的帮助。</p><p>这就是论文所说的未来自己：已经花计算训练出来的后续 checkpoint。它不是预测未来参数。下面先讲 NPO 怎么搬回成功回答，再讲 NPD 怎样换一种方式传知识。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>较早 checkpoint</td><td>恢复成要继续训练的学生。</td></tr><tr><td>较晚 checkpoint</td><td>保存为老师，指导期间参数固定。</td></tr><tr><td>任务验证器</td><td>检查老师回答是否正确，也为学生 RL 提供结果奖励。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;保存较早 checkpoint&quot;] --&gt; B[&quot;继续训练得到未来自己&quot;] --&gt; C[&quot;恢复较早学生&quot;] --&gt; D[&quot;未来自己提供监督&quot;] --&gt; E[&quot;继续 RL&quot;]</pre></figure><section class="method-block"><h3>1. NPO：先建立一份未来老师的正确回答缓存</h3><p>让较晚模型对训练题生成回答，用 verifier 检查结果。某道题找到正确回答，就保留一条；没有正确回答，就不为这道题提供示范。缓存建好后可以在这一段训练里重复使用，老师不必每个更新步都重新写整道题。</p><p>随后把学生恢复到早期 checkpoint。注意，老师和学生现在是两个版本：老师保留后来学到的能力，学生从较早参数重新训练。保存老师、恢复学生、重走这段训练，都有真实计算和存储成本。</p></section><section class="method-block"><h3>2. NPO：只在学生仍困难的题上换入一条正确回答</h3><p>学生先对同一道题生成一组回答。若这一组的成功率低于门槛，且缓存有正确示范，就把组内一个位置替换成老师回答。比如八条原来全错，替换后变成七错一对；组大小仍然是八。学生已经经常做对的题，则保持原来的自主采样。</p><p>再对混合后的整组重新计算相对 advantage，用普通 clipped RL 目标更新。老师那条回答来自另一策略，论文公式按来源策略做概率比修正。近未来实验中省略修正影响较小，但使用差异更大的老师时不能直接照搬这个简化。</p><div class="equation" id="equations"><h4>换入示范后的训练组</h4><div class="math">$$\mathcal G=\{y^S_1,\ldots,y^S_{n-1},y^F_{correct}\}$$</div><p>前 n−1 条是学生回答，最后一条来自未来老师。所有回答一起参与组内奖励比较；这里没有另外加一个 token 蒸馏损失。</p></div></section><section class="method-block"><h3>3. NPD：学生自己写，未来老师给每个位置评分</h3><p>NPD 不往组里插老师回答。它让学生自己生成整条回答，再让未来 checkpoint 看同样的学生前缀，给出下一 token 的概率分布。学生据此调整自己的概率。这是 OPD 的做法，只是老师来自同一次训练的后续版本。</p><p>实际实验采用老师 top-256 token 加一个剩余概率桶上的 JSD。JSD 衡量两份概率分配的差别，学生训练时缩小这个差别；这一阶段没有结果奖励 PPO loss。蒸馏完成后，才接普通 GRPO，观察学生还能继续学到多少。</p></section><section class="method-block"><h3>4. AutoNPO：自动决定何时重来、回到哪里</h3><p>AutoNPO 先记录近期做错的题。当奖励长时间不涨、生成越来越集中时，检查当前模型是否已经能做对一些过去失败的题。只有确认当前模型确实多学到了东西，才考虑让它去教较早的自己，避免没有新本领也盲目回滚。</p><p>再比较几个历史 checkpoint：当前模型比它多会多少，二者预测又相差多大。算法用这两项组成打分，选择回滚距离。当前模型生成指导缓存，学生恢复到选中的旧版本，带着缓存重新训练；追上原进度后，等待下一次触发。</p></section><section class="method-block"><h3>5. 近老师和远老师，最后怎样比较</h3><p>NPD 的两个老师来自同一 GRPO 训练：一个在 step 40，一个在 step 520。两个学生都从原始 Qwen3-VL-8B-Instruct 出发，各自蒸馏，再接相同配置的 GRPO。作者看的是后续 RL 结果，而不只是刚蒸馏完的成绩。</p><p>近老师蒸馏出的学生初始分数更低，继续 RL 后却更高。这说明“老师更强”不能单独决定“这个老师更适合当前学生”。不过两次选中的蒸馏 checkpoint 分别在第 95 和 165 步，因此不能把这个实验说成从头到尾完全等成本。</p></section><p class="source-line"><a href="https://arxiv.org/html/2604.20733v2#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>NPO 和 NPD 最容易混在哪里？</h3><p>看谁生成进入训练的回答就能分开。NPO 把未来老师的一条完整正确回答放进 RL 组；NPD 仍用学生回答，只借未来老师的概率分布来训练。两者不是同一个损失的两个名字。</p></section><section class="practical-detail"><h3>为什么不总用最晚的模型？</h3><p>较晚模型可能会更多题，却也可能采用早期学生难以模仿的做法。论文把这种差异当作选老师时要考虑的因素。最合适的距离可能随训练阶段变化，所以 AutoNPO 会重新比较候选回滚点。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">图文推理 · Qwen3-VL-8B</th><th scope="col">八项平均</th></tr></thead><tbody><tr><td>GRPO</td><td>60.25</td></tr><tr><td>NPO：早期 + 后期</td><td>62.84</td></tr><tr><td>AutoNPO</td><td>63.15</td></tr><tr><td>NPD 后接 RL：近 / 远老师</td><td>63.23 / 61.92</td></tr></tbody></table></div><p class="note">v2 Table 1、Appendix Table 5。NPD 的老师分别为 step 40 / 520；NPO 与 NPD 的训练配置不同，不能直接按这些数值比较优劣。 <a href="https://arxiv.org/html/2604.20733v2">原文表格 ↗</a></p><p>NPO 与 AutoNPO 的主表显示，相比纯 GRPO，八项图文任务均分都有提升。NPD 更值得留意的是近、远老师的比较：继续 RL 后为 63.23 对 61.92。因为两者都是在学生自己的回答上蒸馏，这个差距不能只用“混入的老师轨迹离学生太远”来解释。</p><p>若你想复现，分别记录前向训练得到老师的成本、正确回答缓存的生成量、蒸馏步数、回滚后重做的更新，以及最后独立 RL 的成本。这样才能判断教师选择有多大收益，而不是把多训练的一段当作免费。</p><p class="source-line"><a href="https://arxiv.org/html/2604.20733v2#A1">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>RISE 也使用“未来老师”的说法，但它按公式外推出老师，没有先训练到那个未来 checkpoint。这篇的老师是已经真实训练得到的模型。</p><details class="project-more"><summary>实验对照建议</summary><p>把老师强度、师生时间距离和指导触发分开。NPD 的蒸馏时长不同，不能把后续配置一致写成全流程等成本；递归指导应计入 scout、回滚与重放。</p></details></section>
+<p class="endnote">记住三个动作：NPO 搬回答，NPD 搬概率，AutoNPO 决定何时回滚。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2604.20733v2#S3">NPO 与 AutoNPO ↗</a><a href="https://arxiv.org/html/2604.20733v2#S4.SS3">NPD 比较 ↗</a><a href="https://arxiv.org/html/2604.20733v2#A1">完整实验与成本 ↗</a><a href="sources/03-near-future/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="02-soar.html"><small>上一篇</small>SOAR</a><a href="04-sequential.html"><small>下一篇</small>Sequential Beats Joint</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+[
+  {
+    "file": "01-rise--2609.05295v1.pdf",
+    "title": "RISE: Recursive Improvement via Self-Extrapolating Policy Distillation",
+    "version": "2609.05295v1",
+    "url": "https://arxiv.org/pdf/2609.05295v1",
+    "pages": 28,
+    "bytes": 6272916,
+    "sha256": "d9ce6bd6239f73c13453d6f6df5ab9e6d066049f24f79f2ba35a7d069511d777"
+  },
+  {
+    "file": "02-soar--2601.18778v3.pdf",
+    "title": "Teaching Models to Teach Themselves: Reasoning at the Edge of Learnability",
+    "version": "2601.18778v3",
+    "url": "https://arxiv.org/pdf/2601.18778v3",
+    "pages": 39,
+    "bytes": 3952979,
+    "sha256": "2f76ac87f8eaa16861583df4fa4cf80dfb0c66e715c8bc968a75375a3e925cc5"
+  },
+  {
+    "file": "03-near-future--2604.20733v2.pdf",
+    "title": "Learning from the Near Future: Temporal Self-Distillation for RLVR",
+    "version": "2604.20733v2",
+    "url": "https://arxiv.org/pdf/2604.20733v2",
+    "pages": 19,
+    "bytes": 1282927,
+    "sha256": "de721d4f1cd32adb757904a92c56131b68e1be119999c2e50bc72a6f3a3d07a5"
+  },
+  {
+    "file": "04-sequential--2609.04108v2.pdf",
+    "title": "Sequential Beats Joint: On the Interplay between On-Policy Distillation and RLVR",
+    "version": "2609.04108v2",
+    "url": "https://arxiv.org/pdf/2609.04108v2",
+    "pages": 19,
+    "bytes": 736372,
+    "sha256": "3cd1e8d799cfce7d006b82d3138eb21f64c111198cad26381ca1b1e607678fdd"
+  },
+  {
+    "file": "05-opw--2609.39436v1.pdf",
+    "title": "From Imitation to Reward Discovery: On-Policy Warmup for Agentic RL",
+    "version": "2609.39436v1",
+    "url": "https://arxiv.org/pdf/2609.39436v1",
+    "pages": 29,
+    "bytes": 893975,
+    "sha256": "1b6fbb82f271776045731d332286da13925b75838293696c019cb0eb816c927f"
+  },
+  {
+    "file": "06-metaopd--2610.11989v1.pdf",
+    "title": "MetaOPD: Meta-Learned Token Weighting for On-Policy Distillation",
+    "version": "2610.11989v1",
+    "url": "https://arxiv.org/pdf/2610.11989v1",
+    "pages": 26,
+    "bytes": 3935368,
+    "sha256": "f4833001367301aca5eae6ec2bacbb5690c05163801aba456a2190ce638e5886"
+  },
+  {
+    "file": "07-pear--2602.01058v2.pdf",
+    "title": "Good SFT Optimizes for SFT, Better SFT Prepares for Reinforcement Learning",
+    "version": "2602.01058v2",
+    "url": "https://arxiv.org/pdf/2602.01058v2",
+    "pages": 34,
+    "bytes": 1164508,
+    "sha256": "212663258a0e4b5c324ec9bc30c8bd28f51330ea2c4d73fb5d7400f93bcd5452"
+  },
+  {
+    "file": "08-dr-opd--2609.38025v1.pdf",
+    "title": "Dr. OPD: Learning What to Follow for Optimal On-Policy Distillation of Large Language Models",
+    "version": "2609.38025v1",
+    "url": "https://arxiv.org/pdf/2609.38025v1",
+    "pages": 22,
+    "bytes": 3054625,
+    "sha256": "adac9bfb7bbfa293edb10159aff4c0ccaf86cde4884025af0270485597899fb7"
+  },
+  {
+    "file": "09-op-short--2607.04574v2.pdf",
+    "title": "A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training",
+    "version": "2607.04574v2",
+    "url": "https://arxiv.org/pdf/2607.04574v2",
+    "pages": 31,
+    "bytes": 957546,
+    "sha256": "3906704ccd83c456d81609d0ce7bf22d492bdbab25d4d3e7686e5448b0af398c"
+  },
+  {
+    "file": "10-rl-before-rl--2609.28145v2.pdf",
+    "title": "RL Starts before RL: On Policy Distillation for Better Reinforcement Learning",
+    "version": "2609.28145v2",
+    "url": "https://arxiv.org/pdf/2609.28145v2",
+    "pages": 25,
+    "bytes": 819600,
+    "sha256": "9579476b8e14abbbc87783ae5e111713c5180a0fd632e7fa96a782222d8764e6"
+  },
+  {
+    "file": "11-atesd--2605.11458v3.pdf",
+    "title": "Adaptive Teacher Exposure for Self-Distillation in LLM Reasoning",
+    "version": "2605.11458v3",
+    "url": "https://arxiv.org/pdf/2605.11458v3",
+    "pages": 11,
+    "bytes": 1229747,
+    "sha256": "c24076f71c092976c404dd934bd44a88548a6dc24601e467242167cb6767d9b7"
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "citation_title": [
+    "RL Starts before RL: On Policy Distillation for Better Reinforcement Learning"
+  ],
+  "citation_author": [
+    "Dong, Shuai",
+    "Zhu, Yongfu",
+    "Xu, Yuqi",
+    "Xie, Weichu",
+    "Liuwenpu",
+    "Wang, Ziyue",
+    "Tuo, Kaiwen",
+    "Wang, Congcong",
+    "Wang, Siyuan",
+    "Shao, Wenqi",
+    "Yang, Shuai",
+    "Zhao, Ji",
+    "Ma, Caoyuan",
+    "Chang, Wenzheng",
+    "Wu, Taiqiang",
+    "Yu, Xinlei",
+    "Wu, Hongrui",
+    "He, Xiaoxuan",
+    "Chen, Fangke",
+    "Wang, Dianyi",
+    "Tian, Kanghui",
+    "Chen, Sirry",
+    "Liu, Xingyu",
+    "Wu, Xiangnan",
+    "Guo, Jiawei",
+    "Hou, Haowen",
+    "Chen, LingHan",
+    "Wei, Zhongyu",
+    "Wang, Jiaqi"
+  ],
+  "citation_date": [
+    "2026/09/23"
+  ],
+  "citation_online_date": [
+    "2026/09/26"
+  ],
+  "citation_pdf_url": [
+    "https://arxiv.org/pdf/2609.28145"
+  ],
+  "citation_arxiv_id": [
+    "2609.28145"
+  ],
+  "citation_abstract": [
+    "Reinforcement learning (RL) improves reasoning, but its performance depends on the policy from which training begins. We study on-policy distillation (OPD) as a preparation stage for RL and ask whether its benefits extend beyond improvements in the distilled model's initial accuracy. Under shared RL settings, students initialized with OPD reach higher final performance than those trained with direct RL or supervised fine-tuning followed by RL. This advantage can emerge even when OPD produces little immediate improvement in accuracy. Pre-RL Pass@k does not fully explain the benefit: similar or even higher values do not necessarily lead to better performance after RL. Behavioral analyses point to alignment with the teacher's distribution beyond top-1 agreement as a possible explanation. Such alignment may favor higher-quality reasoning paths while retaining alternatives that RL can further refine using outcome feedback. We further examine how trajectory sources and divergence objectives affect the value of distillation for subsequent RL. Standard reverse-KL OPD performs better before RL, but forward-KL OPD overtakes it afterward. Student rollouts outperform teacher rollouts under both objectives before and after RL. These findings highlight the importance of both objective choice and the states receiving supervision for subsequent RL. Our results support OPD as preparation for RL and favor forward KL when OPD is followed by RL in our comparison."
+  ],
+  "code_links": [
+    "https://github.com/arXiv/html_feedback/issues",
+    "https://github.com/brucemiller/LaTeXML/issues",
+    "https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+  ],
+  "lines": 1337,
+  "chars": 71568,
+  "id": "rl-before-rl"
+}

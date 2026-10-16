@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Sequential Beats Joint · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">04 / 11 · 训练顺序</p>
+<h1>Sequential Beats Joint：先只做蒸馏，再只做 RL</h1>
+<p class="original">Sequential Beats Joint: On the Interplay between On-Policy Distillation and RLVR</p>
+<div class="meta"><span>Li, Chen, Yang et al.</span><span>2026-09-04 · 2609.04108v2</span><a href="https://arxiv.org/abs/2609.04108v2">论文 ↗</a><a href="原文PDF/04-sequential--2609.04108v2.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="sequential" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">把训练拆成两段：前一段只让学生学固定老师，后一段撤掉老师，只按任务奖励训练。论文把它和每一步同时混合 OPD、RL 的做法作比较。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>先找到正确做法，再提高经常做对的概率</h2><p>假设学生原来完全不会一类逻辑题。学过老师以后，它已经能偶尔写出正确解法，但一次作答时仍经常选错。此时继续按结果奖励训练，就有机会把概率集中到那些已经能生成的正确解法上。</p><p>这篇先做 OPD，再做 RL，想完成的就是这两段工作。例子只是解释作者提出的分工，不表示 RL 永远只能重复已有解法。真正的证据来自下面几种训练方式的比较。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>固定老师</td><td>主要实验是 Qwen3-8B；只在 OPD 阶段提供评分。</td></tr><tr><td>学生</td><td>主要是 Qwen3-1.7B-Base；两阶段连续训练同一个学生。</td></tr><tr><td>题目与奖励</td><td>逻辑、数学任务，按规则或参考答案检查最终结果。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;学生自己的 rollout&quot;] --&gt; B[&quot;纯 OPD：扩展解题覆盖&quot;] --&gt; C[&quot;选择切换 checkpoint&quot;] --&gt; D[&quot;纯 RL：提高单次成功&quot;]</pre></figure><section class="method-block"><h3>1. 第一段：学生自己答题，老师给 token 评分</h3><p>学生先根据题目生成完整回答，老师再读取同样的学生前缀，给出各位置的概率。若老师比学生更认可已经生成的 token，这个位置就倾向于提高概率；若老师更不认可，就降低。这一段只使用 OPD 训练信号。</p><p>学生学习的位置来自自己的回答，因此会包含它当前容易生成的错误中间步骤。每次更新后再用新学生采样，直到选定的切换 checkpoint。老师本身保持不变，不跟着学生做 RL。</p></section><section class="method-block"><h3>2. 第二段：加载这个学生，去掉老师信号</h3><p>切换时保留第一段学到的学生参数，开始普通 GRPO。学生对同一题生成多条回答，根据结果奖励计算相对好坏，再更新学生。这一段不再叠加老师的 token 蒸馏信号，也不是另训一个新学生再合并模型。</p><p>公开脚本把这个操作写得很直接：选择 opd_then_rl 分支，提供一个已经训练好的 OPD checkpoint，然后使用 GRPO 的 advantage 计算方式。论文主比较默认在 step 60 切换，同时单独研究更早和更晚的切换时机。</p><div class="equation" id="equations"><h4>两段训练换的是哪个信号</h4><div class="math">$$A_t=\begin{cases}\log\pi_T(y_t)-\log\pi_S(y_t),&amp;\text{先做 OPD}\\A_{reward},&amp;\text{随后做 RL}\end{cases}$$</div><p>Aₜ 表示该位置用于更新的优势信号。第一段来自师生概率差，第二段来自整条回答的奖励比较；实际实现还会处理掩码与截断。</p></div></section><section class="method-block"><h3>3. 与“每一步混合两个 loss”作对照</h3><p>论文比较的第一类联合方法，把奖励 advantage 和老师概率差信号直接相加。这样一次更新同时要求学生更像老师，又提高结果奖励。第二类方法则用老师信号去缩放 RL 信号，例如更强调老师支持的位置。</p><p>这些方法都可能有效，但两个目标不一定完全一致。例如老师本身对几个解法分配得比较分散，RL 想更集中地选择成功解法，而持续蒸馏又把学生拉回老师的概率。顺序方案通过在第二段移除老师，允许 RL 继续调整。</p></section><section class="method-block"><h3>4. 分别看“一次做对”和“多试几次能做对”</h3><p>Pass@1 衡量一次尝试的成功，Pass@32 或 Pass@128 衡量多次里是否至少做对一次。如果大 k 的成绩高、Pass@1 还低，说明正确回答已经有机会出现，但出现得不够稳定。只报告其中一个指标，看不到这种差别。</p><p>论文在若干任务上看到，OPD 提高了多次尝试能解决的问题范围，后续 RL 又提高了一次成功的概率。这是“先扩展，再集中”的依据。它是这些训练曲线的解释，不应该直接推广成所有 OPD 与 RL 任务都遵循的定律。</p></section><section class="method-block"><h3>5. 再检查怎样切换，以及联合训练改了什么</h3><p>作者从 step 20、60、100 的 OPD checkpoint 分别继续 RL。若第一段验证分数仍在提高，较晚切换往往更好；若早已饱和，几个切换点之后差别较小。实操应看自己的学习曲线，而不是照抄六十步。</p><p>作者还找出联合方法中与 OPD 参数变化符号不同的部分，把其中一些参数换回 OPD 的值。多次尝试成绩变好、单次成绩下降的现象，没有被随机替换同数量参数复现。这为两种训练目标之间的取舍提供了比单看最终分数更具体的证据。</p></section><p class="source-line"><a href="https://arxiv.org/html/2609.04108v2#S3.SS2">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>第二段学生离老师更远，为什么还可能变好？</h3><p>KL 可以因为学生概率变得更集中而增大。作者进一步分开看交叉熵和学生自己的熵，发现老师仍然给学生生成内容较高概率。不能只看到一个 KL 上升，就判断学生开始生成老师完全不认可的内容。</p></section><section class="practical-detail"><h3>这是不是证明所有联合方法都不好？</h3><p>不是。该比较主要使用固定外部老师。RISE 每轮从新学生构造老师，ATESD 又改变老师看到的信息；这些做法改变了比较条件。即使在本文实验里，数学上对最强几种方法也有统计持平的情况。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">Qwen3-1.7B-Base</th><th scope="col">逻辑 Pass@1</th><th scope="col">数学 Pass@1</th></tr></thead><tbody><tr><td>GRPO</td><td>49.4</td><td>28.4</td></tr><tr><td>OPD</td><td>53.9</td><td>31.0</td></tr><tr><td>KDRL（联合）</td><td>62.8</td><td>29.0</td></tr><tr><td>OPD → RL</td><td>80.6</td><td>31.8</td></tr></tbody></table></div><p class="note">原文 Table 2；老师 Qwen3-8B。逻辑平均三项，数学平均四项，百分制。 <a href="https://arxiv.org/html/2609.04108v2">原文表格 ↗</a></p><p>逻辑平均中，顺序训练从纯 OPD 的 53.9、纯 GRPO 的 49.4，提升到 80.6，差距很清楚。数学平均则是 31.8 对纯 OPD 的 31.0，差距明显小得多。读表时应分任务看，而不是只记“全部战胜”。</p><p>对需要同时使用老师和奖励的项目，它首先提供了一个简单而强的基线：把两段分开训练。做更复杂的混合损失或可学习切换时，要对齐总训练量和老师开销，再看是否真的比这条简单流程更好。</p><p class="source-line"><a href="https://arxiv.org/html/2609.04108v2#S6">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>RL Starts before RL 继续追问：哪一种蒸馏出来的学生，最适合接着做 RL？这篇主要比较顺序，后者主要比较起点与蒸馏配方。</p></section>
+<p class="endnote">先把 OPD 和 RL 分成两段跑好，再判断复杂的联合训练是否必要。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2609.04108v2#S3.SS2">顺序方案 ↗</a><a href="https://arxiv.org/html/2609.04108v2#S4">比较与机制 ↗</a><a href="https://arxiv.org/html/2609.04108v2#S6">切换与局限 ↗</a><a href="sources/04-sequential/readable.txt">本地全文文字</a></div><p><a href="https://github.com/StringNLPLAB/opd-rlvr">作者代码仓库 ↗</a> · 作者仓库包含训练入口和优势信号计算；发布内容不包含机制分析图的生成代码。</p><div class="code-item"><h3>OPD 阶段的老师信号</h3><p>计算老师与学生的 log-probability 差，再交由训练代码处理截断。</p>
+<pre class="source"><code>def opd_term(teacher_logprob, student_logprob, response_mask):
+    &quot;&quot;&quot;(log pi_T - log pi_S) * m -- the raw teacher signal, per token.&quot;&quot;&quot;
+    return (teacher_logprob - student_logprob) * opd_mask(response_mask)</code></pre><a class="code-link" href="https://github.com/StringNLPLAB/opd-rlvr/blob/f5fd333736495608acd9415a60cd7568593aa1d4/methods/estimators.py#L57">methods/estimators.py:57 · f5fd333</a></div><div class="code-item"><h3>从 OPD checkpoint 切换到 GRPO</h3><p>指定已经训练好的 OPD checkpoint，随后选择 GRPO 更新。</p>
+<pre class="source"><code>  opd_then_rl)  ADV=grpo
+                : &quot;${INIT_CKPT:?set INIT_CKPT to an OPD checkpoint, e.g. \$MODEL_DIR/&lt;opd-run&gt;/global_step_60}&quot;
+                RESUME_MODE=$INIT_CKPT; MICRO_BSZ=4; LOGPROB_MICRO_BSZ=8; N_GPUS=${N_GPUS_OVERRIDE:-4} ;;</code></pre><a class="code-link" href="https://github.com/StringNLPLAB/opd-rlvr/blob/f5fd333736495608acd9415a60cd7568593aa1d4/scripts/train_math.sh#L34">scripts/train_math.sh:34 · f5fd333</a></div></details><nav class="pager" aria-label="相邻论文"><a href="03-near-future.html"><small>上一篇</small>NPO / NPD / AutoNPO</a><a href="05-opw.html"><small>下一篇</small>OPW</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

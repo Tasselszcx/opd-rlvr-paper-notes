@@ -1,0 +1,39 @@
+{
+  "citation_title": [
+    "MetaOPD: Meta-Learned Token Weighting for On-Policy Distillation"
+  ],
+  "citation_author": [
+    "Wang, Zipeng",
+    "Dong, Xinpeng",
+    "Wang, Yuefan",
+    "Lu, Pingchen",
+    "Wei, Xian",
+    "Kuang, Kun",
+    "Wu, Fei",
+    "Dai, Zhongxiang",
+    "Zhang, Min"
+  ],
+  "citation_date": [
+    "2026/10/08"
+  ],
+  "citation_online_date": [
+    "2026/10/08"
+  ],
+  "citation_pdf_url": [
+    "https://arxiv.org/pdf/2610.11989"
+  ],
+  "citation_arxiv_id": [
+    "2610.11989"
+  ],
+  "citation_abstract": [
+    "On-policy distillation (OPD) trains a student on its own generated responses using token-level teacher supervision. However, uniform weighting overlooks differences in token learning value, while existing weighting methods rely on predefined mappings from prediction signals to token weights. These mappings are not learned from the effectiveness of the resulting student updates, limiting their ability to adapt to evolving learning needs. In this paper, we propose MetaOPD, a bilevel optimization framework that jointly learns the student model and a lightweight token-weighting network. The inner objective updates the student through weighted OPD, while the outer objective optimizes the weighting network using validation loss on reference solutions after a virtual student update. Differentiating through this update connects weighting decisions to their effects on post-update performance, allowing the mapping from prediction signals to token weights to evolve alongside the student. Experiments on six mathematical reasoning and three out-of-domain datasets, covering two student scales and seven baselines, demonstrate the effectiveness of MetaOPD, with Avg@8/Pass@8 gains over OPD of 1.99/5.97 percentage points for the 0.6B student and 2.25/6.41 points for the 1.7B student."
+  ],
+  "code_links": [
+    "https://github.com/arXiv/html_feedback/issues",
+    "https://github.com/brucemiller/LaTeXML/issues",
+    "https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+  ],
+  "lines": 1973,
+  "chars": 113071,
+  "id": "metaopd"
+}

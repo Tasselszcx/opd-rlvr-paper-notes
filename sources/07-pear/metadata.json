@@ -1,0 +1,32 @@
+{
+  "citation_title": [
+    "Good SFT Optimizes for SFT, Better SFT Prepares for Reinforcement Learning"
+  ],
+  "citation_author": [
+    "Zhang, Dylan",
+    "Xu, Yufeng",
+    "Wang, Haojin",
+    "Chen, Qingzhi",
+    "Peng, Hao"
+  ],
+  "citation_date": [
+    "2026/02/01"
+  ],
+  "citation_online_date": [
+    "2026/05/28"
+  ],
+  "citation_pdf_url": [
+    "https://arxiv.org/pdf/2602.01058"
+  ],
+  "citation_arxiv_id": [
+    "2602.01058"
+  ],
+  "citation_abstract": [
+    "Post-training of reasoning LLMs is a holistic process that typically consists of an offline SFT stage followed by an online reinforcement learning (RL) stage. However, SFT is often optimized in isolation to maximize SFT performance alone. We show that, after identical RL training, models initialized from stronger SFT checkpoints can significantly underperform those initialized from weaker ones. We attribute this to a mismatch typical in current SFT-RL pipelines: the distribution that generates the offline SFT data can differ substantially from the policy optimized during online RL, which learns from its own rollouts. We propose PEAR (Policy Evaluation-inspired Algorithm for Offline Learning Loss Re-weighting), an SFT-stage method that corrects this mismatch and better prepares the model for RL. PEAR uses importance sampling to reweight the SFT loss, with three variants operating at the token, block, and sequence levels. It can be used to augment standard SFT objectives and incurs little additional training overhead once probabilities for the offline data are collected. We conduct controlled experiments on verifiable reasoning games and mathematical reasoning tasks on Qwen 2.5 and 3 and DeepSeek-distilled models. PEAR consistently improves post-RL performance over canonical SFT, with pass at 8 gains up to a 14.6 percent on AIME2025. Our results suggest that PEAR is an effective step toward more holistic LLM post-training by designing and evaluating SFT with downstream RL in mind rather than in isolation."
+  ],
+  "code_links": [
+    "https://huggingface.co/datasets/PrimeIntellect/SYNTHETIC-2"
+  ],
+  "version": "2602.01058v2",
+  "id": "pear"
+}

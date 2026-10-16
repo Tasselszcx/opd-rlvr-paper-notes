@@ -1,0 +1,98 @@
+TABLE S3.E1
+ | o_{i}\sim\pi_{L}(\cdot\mid x),\qquad i=1,\ldots,n, |  | (1)
+
+TABLE S3.E2
+ | \hat{p}(x)=\frac{1}{n}\sum_{i=1}^{n}r(x,o_{i}). |  | (2)
+
+TABLE S3.E3
+ | \mathcal{G}_{\mathrm{NPO}}(x)=\{o_{1},\ldots,o_{n-1},\tilde{o}_{n}\},\qquad\tilde{o}_{n}=\begin{cases}o_{x}^{\prime}&\text{if }\hat{p}(x)\leq\tau_{\mathrm{gate}}\text{ and }o_{x}^{\prime}\text{ exists},\\ o_{n}&\text{otherwise}.\end{cases} |  | (3)
+
+TABLE S3.E4
+ | A_{i}=\frac{r_{i}-\mathrm{mean}(\{r_{j}\}_{j=1}^{n})}{\mathrm{std}(\{r_{j}\}_{j=1}^{n})}, |  | (4)
+
+TABLE S3.E5
+ | \mathcal{L}_{\mathrm{NPO}}(\theta)=\mathbb{E}_{x,\mathcal{G}_{\mathrm{NPO}}(x)}\left[\frac{1}{n}\sum_{i=1}^{n}\frac{1}{|o_{i}|}\sum_{\ell=1}^{|o_{i}|}\min\left(\rho^{q}_{i,\ell}(\theta)A_{i},\;\mathrm{clip}\big(\rho^{q}_{i,\ell}(\theta),1-\epsilon,1+\epsilon\big)A_{i}\right)\right], |  | (5)
+
+TABLE S3.E6
+ | \rho^{q}_{i,\ell}(\theta)=\frac{\pi_{\theta}(o_{i,\ell}\mid x,o_{i,<\ell})}{q_{i}(o_{i,\ell}\mid x,o_{i,<\ell})}. |  | (6)
+
+TABLE S3.E7
+ | \hat{\mathcal{S}}(\Delta)=\frac{\hat{Q}(\Delta)}{\hat{V}(\Delta)}, |  | (7)
+
+TABLE S3.E8
+ | \Delta^{\star}=\arg\max_{\Delta}\hat{\mathcal{S}}(\Delta). |  | (8)
+
+TABLE S4.T1.7.1
+Method | MMMU-Pro | MathVista | MathVision | ZeroBench | WeMath | MMBench | MM-Star | MathVerse | Avg.
+Qwen3-VL-8B-Instruct | 51.75 | 73.80 | 47.37 | 19.76 | 54.10 | 89.79 | 71.83 | 54.61 | 57.88
+Distillation methods
+OPSD | 53.58 | 75.10 | 47.53 | 21.06 | 54.95 | 89.70 | 71.57 | 58.03 | 58.94
+SDPO | 52.64 | 74.00 | 47.27 | 25.15 | 52.19 | 90.03 | 72.21 | 58.44 | 58.99
+OPD (32B teacher) | 53.42 | 76.95 | 48.57 | 21.71 | 58.19 | 90.15 | 72.00 | 53.67 | 59.33
+RLVR methods
+GRPO (pure on-policy) | 55.78 | 76.20 | 48.82 | 22.60 | 56.57 | 90.29 | 72.20 | 59.52 | 60.25
+LUFFY (external teacher) | 54.23 | 73.80 | 54.00 | 20.51 | 52.38 | 89.49 | 69.47 | 55.58 | 58.68
+ExGRPO (historical replay) | 55.49 | 77.30 | 55.46 | 19.01 | 62.67 | 90.44 | 72.00 | 56.89 | 61.16
+RLEP (far future) | 55.38 | 78.50 | 54.23 | 19.61 | 62.48 | 90.45 | 72.27 | 58.91 | 61.48
+NPO (early only) | 56.85 | 76.60 | 54.31 | 26.35 | 62.76 | 90.41 | 70.30 | 59.38 | 62.12
+NPO (early + late) | 57.07 | 76.30 | 54.61 | 24.85 | 66.95 | 90.30 | 72.67 | 60.00 | 62.84
+AutoNPO | 57.24 | 79.20 | 55.72 | 24.70 | 66.00 | 90.63 | 72.63 | 59.11 | 63.15
+
+TABLE S4.T2.8.1
+Method | AIME 2024 | AIME 2025 | AMC | MATH-500 | Minerva Math | OlympiadBench | Avg.
+GRPO | 24.8 | 17.8 | 67.5 | 88.4 | 38.6 | 55.3 | 48.7
+NPO | 34.6 | 25.7 | 66.9 | 89.2 | 40.4 | 58.2 | 52.5
+Method | TempCompass | MotionBench | MLVU-Dev | VideoMathQA | Charades-STA | VideoMME-v2 | Avg.
+GRPO | 75.98 | 57.01 | 75.80 | 50.33 | 57.65 | 33.03 | 58.30
+NPO | 76.47 | 59.17 | 76.40 | 52.71 | 58.06 | 33.81 | 59.44
+
+TABLE A1.T3.7.1
+Method | AIME 2024 | AIME 2025 | AMC | MATH-500 | Minerva Math | OlympiadBench | Avg.
+LUFFY | 29.4 | 23.1 | 65.6 | 87.6 | 37.5 | 57.2 | 50.1
+\hookrightarrow Continual LUFFY | 30.7 | 22.5 | 66.2 | 86.8 | 41.2 | 55.3 | 50.4
+\hookrightarrow GRPO | 24.8 | 17.8 | 67.5 | 88.4 | 38.6 | 55.3 | 48.7
+\hookrightarrow ExGRPO | 32.3 | 25.7 | 65.6 | 87.6 | 40.1 | 57.0 | 51.4
+\hookrightarrow NPO | 34.6 | 25.7 | 66.9 | 89.2 | 40.4 | 58.2 | 52.5
+
+TABLE A1.T3.9
+Benchmark | Base | GRPO | NPO | Gain
+TempCompass | 75.69 | 75.98 | 76.47 | +0.49
+MotionBench | 56.14 | 57.01 | 59.17 | +2.16
+MLVU-Dev | 73.32 | 75.80 | 76.40 | +0.60
+VideoMathQA | 47.81 | 50.33 | 52.71 | +2.38
+Charades-STA | 56.00 | 57.65 | 58.06 | +0.41
+VideoMME-v2 | 32.50 | 33.03 | 33.81 | +0.78
+Avg. | 56.91 | 58.30 | 59.44 | +1.14
+
+TABLE A1.T4.6.1
+Method | MMMU-Pro | MathVista | MathVision | ZeroBench | WeMath | MMBench | MM-Star | MathVerse | Avg.
+GRPO | 55.78 | 76.20 | 48.82 | 22.60 | 56.57 | 90.29 | 72.20 | 59.52 | 60.25
+NPO, early-stage only | 56.85 | 76.60 | 54.31 | 26.35 | 62.76 | 90.41 | 70.30 | 59.38 | 62.12
+NPO, early + late-stage | 57.07 | 76.30 | 54.61 | 24.85 | 66.95 | 90.30 | 72.67 | 60.00 | 62.84
+AutoNPO | 57.24 | 79.20 | 55.72 | 24.70 | 66.00 | 90.63 | 72.63 | 59.11 | 63.15
+Search range \Delta_{\max}=20 | 57.09 | 77.90 | 53.29 | 23.95 | 67.24 | 90.60 | 72.53 | 59.90 | 62.81
+Search range \Delta_{\max}=80 | 55.98 | 76.60 | 52.58 | 23.05 | 65.62 | 90.83 | 72.07 | 59.26 | 62.00
+Fixed \Delta=40 | 56.97 | 76.85 | 55.39 | 25.60 | 63.24 | 90.89 | 72.77 | 60.15 | 62.73
+Gate \tau_{\mathrm{gate}}=0.3 | 55.38 | 77.75 | 52.99 | 23.50 | 60.86 | 90.45 | 72.53 | 58.87 | 61.54
+Gate \tau_{\mathrm{gate}}=0.8 | 56.38 | 76.75 | 54.62 | 24.10 | 64.19 | 90.08 | 73.10 | 56.92 | 62.02
+Late-stage NPO w/o exact IS | 56.50 | 76.60 | 55.03 | 24.40 | 66.10 | 90.30 | 71.90 | 59.99 | 62.60
+
+TABLE A1.T5.8.1
+Method | MMMU-Pro | MathVista | MathVision | ZeroBench | WeMath | MMBench | MM-Star | MathVerse | Avg.
+Qwen3-VL-8B-Instruct | 51.75 | 73.80 | 47.37 | 19.76 | 54.10 | 89.79 | 71.83 | 54.61 | 57.88
+GRPO | 55.78 | 76.20 | 48.82 | 22.60 | 56.57 | 90.29 | 72.20 | 59.52 | 60.25
+OPD (32B teacher) | 53.42 | 76.95 | 48.57 | 21.71 | 58.19 | 90.15 | 72.00 | 53.67 | 59.33
+OPD (far, step 520) + GRPO | 56.50 | 75.40 | 54.84 | 25.15 | 62.57 | 90.49 | 71.67 | 58.74 | 61.92
+OPD (near, step 40) + GRPO | 58.57 | 76.15 | 56.64 | 24.70 | 65.24 | 90.96 | 72.77 | 60.78 | 63.23
+
+TABLE A1.T6.5.1
+Method | MMMU-Pro | MathVista | MathVision | ZeroBench | WeMath | MMBench | MM-Star | MathVerse | Avg.
+GRPO ( n=8 ) | 55.78 | 76.20 | 48.82 | 22.60 | 56.57 | 90.29 | 72.20 | 59.52 | 60.25
+GRPO ( n=16 ) | 55.67 | 74.75 | 53.78 | 23.50 | 62.19 | 90.16 | 69.57 | 59.50 | 61.14
+AutoNPO | 57.24 | 79.20 | 55.72 | 24.70 | 66.00 | 90.63 | 72.63 | 59.11 | 63.15
+
+TABLE A3.E9
+ | \Delta^{\star}=\arg\max_{\Delta\in\mathcal{D}}\frac{\hat{Q}(\Delta)}{\hat{V}(\Delta)}, |  | (9)
+
+TABLE A3.E10
+ | \hat{Q}(\Delta)=\mathrm{pass\text{-}rate}\big(\pi^{(t)};\mathcal{B}_{\Delta}\big), |  | (10)

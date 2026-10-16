@@ -1,0 +1,7 @@
+.venv/
+qa/
+code/
+**/__pycache__/
+.DS_Store
+*.zip
+.build-*/

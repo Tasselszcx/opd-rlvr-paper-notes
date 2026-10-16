@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>RL Starts before RL · OPD 与 RLVR</title>
+  <link rel="stylesheet" href="assets/reader.css">
+  <link rel="stylesheet" href="assets/katex/katex.min.css">
+  <script defer src="assets/katex/katex.min.js"></script>
+  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/mermaid.min.js"></script>
+  <script defer src="assets/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
+  <main class=""><section class="hero">
+<p class="eyebrow">10 / 11 · 训练顺序</p>
+<h1>RL Starts before RL：蒸馏以后，把 RL 接完再比较</h1>
+<p class="original">RL Starts before RL: On Policy Distillation for Better Reinforcement Learning</p>
+<div class="meta"><span>Dong, Zhu, Xu et al.</span><span>2026-09-26 · 2609.28145v2</span><a href="https://arxiv.org/abs/2609.28145v2">论文 ↗</a><a href="原文PDF/10-rl-before-rl--2609.28145v2.pdf">本地 PDF ↗</a></div>
+<button class="readbtn" data-paper="rl-before-rl" aria-pressed="false">标记为已读</button>
+</section><nav class="article-toc" aria-label="本文目录"><a href="#example">先看例子</a><a href="#method">怎么做</a><a href="#equations">公式解释</a><a href="#details">容易混淆处</a><a href="#results">结果</a><a href="#connections">论文区别</a></nav><article id="reading-content" class="article-body">
+<div class="lede">作者训练几种不同的学生起点，再给它们相同的 RL。结果发现：刚蒸馏完分数更高的模型，接着 RL 后不一定更好；选择蒸馏方法时，评价终点要往后移。</div>
+<section id="problem" class="section"><aside id="example" class="worked-example"><p class="eyebrow">说明性例子</p><h2>现在分数高，和接下来学得好，可能不是一个学生</h2><p>假设两种蒸馏得到学生甲和学生乙。甲现在做题正确率略高，所以只看蒸馏结果，你会选甲。但把同样的数据、奖励和训练步数交给它们继续 RL 后，乙反而达到更高分。</p><p>这篇就是通过一组这样的对照，检查哪种训练准备更适合后续 RL。它主要提供实验发现和解释，没有另外提出一个复杂的新教师控制器。</p></aside></section>
+<section id="method" class="section"><h2><span>01</span>具体怎么做</h2><div class="tablewrap"><table class="setup"><thead><tr><th scope="col">谁 / 什么数据</th><th scope="col">负责什么</th></tr></thead><tbody><tr><td>三种起点</td><td>原模型直接 RL、先 SFT 再 RL、先 OPD 再 RL。</td></tr><tr><td>师生规模</td><td>文本与视觉语言各有一组 8B 学生、32B 老师。</td></tr><tr><td>比较方式</td><td>每组实验的后续 RL 数据、奖励和优化配置保持一致。</td></tr></tbody></table></div>
+<figure class="diagram"><figcaption>训练流程</figcaption><pre class="mermaid">flowchart LR
+ A[&quot;同一初始学生&quot;] --&gt; B[&quot;SFT / OPD / 无准备&quot;] --&gt; C[&quot;各自接相同 RL&quot;] --&gt; D[&quot;比较最终分数&quot;]
+ B -. 初始分数不够 .-&gt; D</pre></figure><section class="method-block"><h3>1. 先准备 Base、SFT 和 OPD 三种学生</h3><p>Base 不做前面的老师训练，直接进入 RL。SFT 让学生学习老师已经生成并验证正确的回答。标准 OPD 则让学生自己生成回答，老师在这些学生前缀上提供完整概率分布，学生用 reverse KL 来学习。</p><p>两种老师训练都可能提高当前分数，但它们让学生接触的数据位置和训练目标不同。SFT 主要沿老师轨迹学下一 token，OPD 会沿学生自己写出的文字学习老师概率。这些变化是否帮助后续 RL，要继续训练才知道。</p></section><section class="method-block"><h3>2. 给三种起点接相同的 RL</h3><p>在每组设定内，使用相同的 GRPO-style 训练数据、验证器、优化器和采样配置。从各自的准备 checkpoint 出发，记录 RL 前后成绩。准备阶段与 RL 阶段使用分开的题目数据，测试题也不拿来更新模型。</p><p>文本实验特别直观：Base 和 OPD 在 RL 前平均分很接近，分别为 36.48 和 37.02；RL 后变成 51.90 和 59.18。初始只差 0.54 点，最后差 7.28 点，说明前一段训练的作用没有全部体现在即时分数上。</p></section><section class="method-block"><h3>3. 检查是否只是 OPD 让正确答案更容易被采到</h3><p>作者另选共同的诊断题，对每个起点每题采样六十四次，比较 Pass@k、答对次数，以及一组回答中全错或有对有错的比例。如果 OPD 的优势只是提前产生更多成功回答，这些统计应该能反映出很大区别。</p><p>但文本 Base 与 OPD 的 Pass@64 分别约为 80.4 和 80.0，十分接近，后续 RL 却差得很大。这个结果说明测到的初始覆盖不够解释全部收益。它不意味着覆盖无关，因为相同总比例也可能来自不同题目和不同推理路径。</p></section><section class="method-block"><h3>4. 再看 token 概率，而不只看最可能的词</h3><p>假设老师对 A、B、C 给概率 0.6、0.3、0.1。学生甲给 0.98、0.01、0.01，学生乙给 0.55、0.35、0.10。两者最可能输出的都是 A，但甲几乎不考虑 B，乙还保留 B 这条选择。这是说明分布差异的例子，不是论文实验数值。</p><p>作者因此检查 top-20 概率分布的 JS 差异、top-1 是否一致，以及一些推理词位置的熵。OPD 在这些诊断里更接近老师的分布，同时保留较多其他选择；SFT 即使最大概率词更常一致，也不一定具有相同性质。</p></section><section class="method-block"><h3>5. 最后交换 KL 方向，看看选择会不会反过来</h3><p>在视觉语言实验里，再比较学生轨迹上的 forward KL 与 reverse KL。FKL 更强调学生不要漏掉老师支持的续写；RKL 更惩罚学生把概率给老师不支持的续写。训练后先测一次，再给两者接相同 RL，再测一次。</p><p>RKL 蒸馏后的分数略高，但后续 RL 结束时 FKL 更高。作者又把采样轨迹换成老师轨迹，此时仍是 RKL 更好。所以“用哪种 KL”与“在哪些前缀上学习”要一起比较，不能只根据其中一项推出通用答案。</p><div class="equation" id="equations"><h4>两个 KL 为什么会有不同效果</h4><div class="math">$$\begin{aligned}D_{FKL}&amp;=\sum_v p_T(v)\log\frac{p_T(v)}{p_S(v)}\\D_{RKL}&amp;=\sum_v p_S(v)\log\frac{p_S(v)}{p_T(v)}\end{aligned}$$</div><p>v 是候选 token。第一行按老师概率给各项加权，第二行按学生概率加权；所以相同的概率差，在两种损失里受到的关注不同。</p></div></section><p class="source-line"><a href="https://arxiv.org/html/2609.28145v2#S3">原文方法 ↗</a></p></section>
+<section id="details" class="section"><h2><span>02</span>容易弄混的地方</h2><section class="practical-detail"><h3>作者认为 OPD 为什么有帮助？</h3><p>一种解释是，老师调整了学生对不同续写的概率，同时保留了一些可以继续尝试的选择。后续奖励再帮助学生选得更准。这是由行为诊断支持的解释；论文没有把概率对齐和保留不确定性的独立因果贡献完全分开。</p></section><section class="practical-detail"><h3>保留更多不确定性总是好事吗？</h3><p>不是。随机模型也可能很不确定，却没有有用解法。这里讨论的是学生接近较好老师的预测，同时保留可以被奖励进一步选择的续写，不能把它简化成只提高熵就能让 RL 更好。</p></section><section class="practical-detail"><h3>老师轨迹那组，就是普通 SFT 吗？</h3><p>也不是。那组实验仍然给学生完整的老师概率分布，只把回答的生成者从学生换成老师。这样主要比较的是在哪些前缀上训练，而不是同时把软概率目标换成硬标签。把这两种变化分开，才能知道结果差在何处。</p></section></section>
+<section id="results" class="section"><h2><span>03</span>结果怎么样</h2><div class="tablewrap"><table class=""><thead><tr><th scope="col">设置 / 准备方式</th><th scope="col">RL 前</th><th scope="col">RL 后</th></tr></thead><tbody><tr><td>文本 · Base</td><td>36.48</td><td>51.90</td></tr><tr><td>文本 · OPD-RKL</td><td>37.02</td><td>59.18</td></tr><tr><td>视觉语言 · OPD-RKL</td><td>60.66</td><td>63.02</td></tr><tr><td>视觉语言 · OPD-FKL</td><td>60.17</td><td>64.87</td></tr></tbody></table></div><p class="note">v2 Tables 1–2。文本平均八项、视觉语言平均二十项；两种设置不能横向比较绝对分数。 <a href="https://arxiv.org/html/2609.28145v2">原文表格 ↗</a></p><p>表里的两个视觉语言起点把排序反转展示得很清楚：RKL 在 RL 前为 60.66，高于 FKL 的 60.17；RL 后 FKL 为 64.87，高于 RKL 的 63.02。只用蒸馏终点挑方法，会得出相反选择。</p><p>注意 benchmark 平均与诊断题上的 Pass@k 来自不同评估协议，不能混成一列相减。对你自己的流程，最直接的实验是固定后续 RL，给几个 warmup 方案都接完同样训练，再检查初始准确率、Pass@k 和最终收益之间的关系。</p><p class="source-line"><a href="https://arxiv.org/html/2609.28145v2#S6">原文实验 ↗</a></p></section>
+<section id="connections" class="section"><h2><span>04</span>和其他论文的区别</h2><p>OPW 研究在 agent 任务上如何做 warmup；这篇提醒你，评价任何 warmup 时，都要看老师离开后学生继续训练的结果。</p><details class="project-more"><summary>实验对照建议</summary><p>即时分数与后续价值会排序反转，但这不自动证明必须做复杂元优化。应以同一批指导候选检验短期代理、Pass@k 与真实独立 RL 收益各自能预测多少。</p></details></section>
+<p class="endnote">别只问蒸馏以后学生考了多少分，还要问它继续 RL 以后能学到多少。</p>
+</article><details class="sources"><summary>论文与代码来源</summary><div class="evidence"><a href="https://arxiv.org/html/2609.28145v2#S3">共享实验设置 ↗</a><a href="https://arxiv.org/html/2609.28145v2#S5">机制诊断 ↗</a><a href="https://arxiv.org/html/2609.28145v2#S6">KL 与轨迹比较 ↗</a><a href="sources/10-rl-before-rl/readable.txt">本地全文文字</a></div><p>未找到可确认的作者实现仓库，方法说明以论文正文和附录为依据。</p></details><nav class="pager" aria-label="相邻论文"><a href="09-op-short.html"><small>上一篇</small>OP-Short</a><a href="11-atesd.html"><small>下一篇</small>ATESD</a></nav></main>
+  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
+</body>
+</html>

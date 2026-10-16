@@ -1,0 +1,39 @@
+{
+  "citation_title": [
+    "Learning from the Near Future: Temporal Self-Distillation for RLVR"
+  ],
+  "citation_author": [
+    "Qin, Chuanyu",
+    "Yang, Chenxu",
+    "Si, Qingyi",
+    "Gu, Naibin",
+    "Yao, Dingyu",
+    "Lin, Zheng",
+    "Fu, Peng",
+    "Duan, Nan",
+    "Wang, Jiaqi"
+  ],
+  "citation_date": [
+    "2026/04/22"
+  ],
+  "citation_online_date": [
+    "2026/10/01"
+  ],
+  "citation_pdf_url": [
+    "https://arxiv.org/pdf/2604.20733"
+  ],
+  "citation_arxiv_id": [
+    "2604.20733"
+  ],
+  "citation_abstract": [
+    "Reinforcement learning with verifiable rewards (RLVR) is a core post-training recipe for reasoning models, yet pure on-policy learning can be inefficient when useful trajectories are difficult to discover or exploration narrows. Existing self-guided approaches largely reuse capability already available to the current or earlier learner. We instead ask whether learning can also make use of capabilities that emerge later in training: can a model learn from its own future self? We introduce temporal self-distillation, in which a policy receives guidance from a stronger later checkpoint of itself. We hypothesize that the most useful temporal teacher need not be the strongest one: a teacher must provide sufficiently new capability while remaining compatible enough for that capability to be readily transferred, motivating a near-future regime. We study this principle through two complementary mechanisms. Near-Future Policy Optimization (NPO) performs off-policy behavioral transfer using verified future-self trajectories, while Near-Future Policy Distillation (NPD) performs on-policy token-level transfer on learner-generated trajectories. We further introduce AutoNPO, which adaptively determines when temporal guidance is useful and how far to roll back, turning future-self guidance into a repeated self-bootstrap process. Across eight image-text benchmarks, NPO improves GRPO from 60.25 to 62.84 and AutoNPO reaches 63.15, with consistent gains on text-only and video reasoning. Under NPD, a near-future teacher reaches 63.23 after continued RL versus 61.92 with a far-future teacher, despite lower immediate post-distillation performance. Together, these results suggest that effective temporal self-distillation depends not simply on teacher strength, but on a balance between newly acquired capability and learner compatibility."
+  ],
+  "code_links": [
+    "https://github.com/arXiv/html_feedback/issues",
+    "https://github.com/brucemiller/LaTeXML/issues",
+    "https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+  ],
+  "lines": 1374,
+  "chars": 73470,
+  "id": "near-future"
+}

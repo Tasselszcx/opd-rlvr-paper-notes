@@ -1,0 +1,4 @@
+beautifulsoup4==4.15.0
+fonttools==4.60.2
+brotli==1.2.0
+playwright==1.60.0
