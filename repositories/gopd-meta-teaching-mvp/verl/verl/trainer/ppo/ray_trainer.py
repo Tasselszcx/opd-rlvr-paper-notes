@@ -1386,6 +1386,14 @@ class RayPPOTrainer:
                             reward_tensor, reward_extra_infos_dict = ray.get(future_reward)
                         batch.batch["token_level_scores"] = reward_tensor
 
+                        if self.meta_teaching is not None:
+                            from meta_teaching.metrics import reward_group_metrics
+
+                            metrics.update(reward_group_metrics(
+                                reward_tensor.sum(-1).detach().float().cpu().tolist(),
+                                batch.non_tensor_batch["uid"].tolist(),
+                            ))
+
                         if reward_extra_infos_dict:
                             batch.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})
 

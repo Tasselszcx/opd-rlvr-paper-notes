@@ -1,11 +1,11 @@
 {
   "delivery_date": "2026-10-18",
   "method_version": "0.1.0",
-  "delivery_revision": "github-handoff-2",
+  "delivery_revision": "research-iteration-1",
   "upstream_repository": "https://github.com/RUCBM/G-OPD",
   "upstream_commit": "37371a4c31ad7947746200d234161769191f4748",
   "git_history": "source snapshot imported into opd-rlvr-paper-notes; upstream provenance retained",
-  "runtime_code_changed_from_v0_1_0": false,
+  "runtime_code_changed_from_v0_1_0": true,
   "b300_gpu_training_verified": false,
   "b300_environment_lock_included": false,
   "model_weights_included": false,
@@ -21,5 +21,6 @@
   "github_repository": "https://github.com/Tasselszcx/opd-rlvr-paper-notes",
   "github_directory": "repositories/gopd-meta-teaching-mvp",
   "source_manifest": "SOURCE_FILES.sha256.json",
-  "source_manifest_scope": "current delivered files excluding the manifest itself and local generated artifacts"
+  "source_manifest_scope": "current delivered files excluding the manifest itself and local generated artifacts",
+  "changes": "Per-question validation records and verifier-reward-group diagnostics; training objectives unchanged"
 }

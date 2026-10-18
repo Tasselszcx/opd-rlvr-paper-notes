@@ -139,6 +139,7 @@ def build_phase_command(config: dict, spec: PhaseSpec, python: str = sys.executa
         "trainer.project_name": "meta_teaching_mvp",
         "trainer.experiment_name": spec.phase_id.replace("/", "_"),
         "trainer.logger": ["console"],
+        "trainer.validation_data_dir": str(Path(spec.output_dir) / "validation_generations"),
         "ray_kwargs.ray_init.address": "local",
         "meta_teaching.enabled": True,
         "meta_teaching.phase": spec.phase,
