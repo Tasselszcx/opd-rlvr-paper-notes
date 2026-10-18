@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "models": {"student": "${STUDENT_MODEL}", "teacher": "${TEACHER_MODEL}"},
+  "data": {"manifest": "data/research/manifest.json", "reward": "math_verify"},
+  "training": {"n_gpus": 8, "rollout_tp": 2, "warmup_steps": 10, "rl_steps": 30},
+  "experiment": {
+    "output_dir": "runs/budget_8gpu",
+    "protocol": "fixed_walltime",
+    "branch_budget_seconds": 3600,
+    "warmup_budget_fraction": 0.25,
+    "validation_reserve_seconds": 180,
+    "budget_tolerance_fraction": 0.1,
+    "rounds": 3,
+    "repeats": 3,
+    "max_total_gpu_hours": 220,
+    "teacher_mode": "fixed",
+    "promotion": "policy"
+  }
+}

@@ -1,0 +1,4 @@
+...................................................ss................... [ 74%]
+.........................                                                [100%]
+- generated xml file: ${VALIDATION_LOG_DIR}/lean-suite.xml -
+95 passed, 6 skipped in 16.69s

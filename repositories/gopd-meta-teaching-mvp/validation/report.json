@@ -1,0 +1,37 @@
+{
+  "mvp_version": "0.1.0",
+  "upstream_commit": "37371a4c31ad7947746200d234161769191f4748",
+  "full_cpu_suite": {
+    "passed": 137,
+    "failed": 0,
+    "warnings": 1
+  },
+  "lean_cpu_suite": {
+    "passed": 95,
+    "skipped": 6,
+    "failed": 0
+  },
+  "test_host": "macOS arm64",
+  "python": "3.11.17",
+  "gpu_training_executed": false,
+  "cuda_nccl_fsdp_vllm_executed": false,
+  "verified": [
+    "actual Hydra config and dataclass contracts",
+    "real Parquet and RLHFDataset/collate/DataProto path",
+    "local tokenizer input separation",
+    "actual PyTorch tiny-policy gradients and AdamW updates",
+    "teacher-free loss independence",
+    "real local subprocess lifecycle and failure accounting",
+    "dataset hash binding across resume",
+    "controller update/promotion/test-split isolation",
+    "explicitly simulated multi-round orchestration"
+  ],
+  "not_verified": [
+    "8-GPU startup and memory fit",
+    "CUDA/NCCL/vLLM runtime",
+    "full FSDP training convergence",
+    "research benchmark improvements",
+    "Blackwell hardware compatibility"
+  ],
+  "synthetic_results_are_research_evidence": false
+}

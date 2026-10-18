@@ -1,0 +1,38 @@
+# Conservative G-OPD FSDP/vLLM profile for Linux x86_64, Python 3.10/3.11,
+# NVIDIA Ampere/Hopper (compute capability 8.x/9.x). NOT for Blackwell/B300.
+# Prefer an existing known-working G-OPD environment over installing this.
+# Core PyPI dependency metadata was checked; eight-GPU training was NOT run.
+# This pins direct dependencies, not every transitive dependency or wheel hash.
+# Use scripts/mvp_environment.sh install-hopper inside a dedicated environment.
+-r mvp_requirements_cpu.txt
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0
+vllm==0.8.5.post1
+transformers==4.51.3
+tokenizers==0.21.1
+# 0.6.2 in the original install script conflicts with this repo's >=0.8 setup.py.
+# 0.8.3 meets setup.py; basic TensorDict operations were checked on CPU torch2.6.
+tensordict==0.8.3
+# Official torchdata v0.11.0 README pairs this version with torch2.6.0.
+torchdata==0.11.0
+# vLLM requires >=2.43 and excludes the entire 2.44 series.
+ray[default]==2.45.0
+numpy==1.26.4
+accelerate==1.6.0
+datasets==3.5.1
+peft==0.15.2
+pandas==2.2.3
+codetiming==1.4.0
+dill==0.3.8
+pybind11==2.13.6
+pylatexenc==2.10
+wandb==0.19.11
+tensorboard==2.19.0
+math-verify==0.7.0
+setuptools==80.9.0
+wheel==0.45.1
+ninja==1.11.1.4
+# flash-attn==2.7.4.post1 is built separately AFTER torch is installed.
+# The script checks nvcc and forces a local source build for the installed ABI.
+# No Megatron, SGLang, FlashInfer, Liger or TransformerEngine is needed by the MVP.

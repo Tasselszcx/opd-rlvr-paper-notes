@@ -1,0 +1,6 @@
+# CPU orchestration, dataset preparation and lightweight tests only.
+# Does not install torch, CUDA, vLLM or the complete upstream verl environment.
+pytest==8.4.2
+pyarrow==19.0.1
+hydra-core==1.3.2
+packaging==24.2

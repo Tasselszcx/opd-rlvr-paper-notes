@@ -1,44 +1,38 @@
-# OPD 与 RLVR 文献调研
+# OPD / RLVR：阅读笔记与实验代码
 
-11 篇论文的中文方法解读、训练步骤、实验结果与对应原文 PDF。
+| 内容 | 入口 |
+|---|---|
+| 11 篇论文的中文解读、原文 PDF 与调研笔记 | [reading-notes](reading-notes/README.md) · [在线阅读](https://tasselszcx.github.io/opd-rlvr-paper-notes/reading-notes/) |
+| G-OPD 元教学 MVP 完整源码、配置和测试 | [repositories/gopd-meta-teaching-mvp](repositories/gopd-meta-teaching-mvp/) |
+| B300 部署与验收交接 | [HANDOFF_B300.md](repositories/gopd-meta-teaching-mvp/HANDOFF_B300.md) |
+| 发给 B300 Codex 的接手指令 | [START_B300_CODEX.txt](repositories/gopd-meta-teaching-mvp/START_B300_CODEX.txt) |
 
-**[在线阅读](https://tasselszcx.github.io/opd-rlvr-paper-notes/)**
-
-也可以下载仓库，解压后用浏览器打开 `index.html`。页面、公式、流程图和 PDF 支持离线阅读。
-
-## 论文
-
-1. RISE
-2. SOAR
-3. Learning from the Near Future：NPO / NPD / AutoNPO
-4. Sequential Beats Joint
-5. OPW
-6. MetaOPD
-7. PEAR
-8. Dr. OPD
-9. OP-Short
-10. RL Starts before RL
-11. ATESD
-
-每篇页面顶部提供论文链接及本地 PDF，文末提供正文依据和公开代码来源。实验数据引自论文。
-
-## 文件
-
-- `index.html`：阅读入口。
-- `原文PDF/`：11 篇论文原文。
-- `data/papers.json`：内容与顺序的唯一数据源。
-- `scripts/`：生成及检查工具。
-- `assets/`：本地字体、公式和流程图资源。
-- `sources/`：原文存档及引用信息。
-
-## 更新页面
+## 在 B300 上接手
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python scripts/build.py
+git clone https://github.com/Tasselszcx/opd-rlvr-paper-notes.git
+cd opd-rlvr-paper-notes/repositories/gopd-meta-teaching-mvp
 ```
 
-修改 `data/papers.json` 后运行生成脚本，再提交生成的页面即可。GitHub Pages 从 `main` 分支根目录发布。
+让执行端先读 `HANDOFF_B300.md`，再按 `START_B300_CODEX.txt` 完成环境适配和真实 8 卡 smoke。完整源码已放在当前目录，无需另传离线仓库包或初始化子模块。
 
-论文和第三方资源保留各自的版权及许可证，相关许可证位于 `assets/fonts/OFL.txt` 和 `assets/licenses/`。
+**当前训练代码经过 CPU 验证，B300 环境与 GPU 训练尚未实测。** 本仓库不包含模型权重、正式训练数据或已验证的 B300 环境锁。B300 不使用 `install-hopper`；执行端需复用或建立兼容环境后进行真实验收。
+
+## 目录
+
+```text
+reading-notes/                        阅读页面、PDF、调研与生成工具
+repositories/
+  README.md                          代码目录说明
+  gopd-meta-teaching-mvp/             可直接编辑的完整 MVP 源码
+    HANDOFF_B300.md                   B300 交接
+    START_B300_CODEX.txt              接手指令
+    meta_teaching/                   教法选择与多轮实验调度
+    mvp_configs/                     smoke、pilot、固定时间配置
+    verl/                           G-OPD 所用 verl 及 MVP 修改
+    tests_mvp/                      CPU 与接口测试
+```
+
+阅读内容整体放在 `reading-notes/`，相对链接和离线资源保留。根目录是在线导航入口，旧论文页面地址通过 `404.html` 跳转到新位置。维护阅读页面时，从仓库根目录执行 `reading-notes/README.md` 中的构建命令。
+
+上游 G-OPD、verl、论文、字体及第三方资源保留各自许可证；代码来源见 [MVP_UPSTREAM.json](repositories/gopd-meta-teaching-mvp/MVP_UPSTREAM.json)。

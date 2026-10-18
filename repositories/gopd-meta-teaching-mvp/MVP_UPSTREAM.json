@@ -1,0 +1,17 @@
+{
+  "mvp_version": "0.1.0",
+  "upstream_repository": "https://github.com/RUCBM/G-OPD",
+  "upstream_commit": "37371a4c31ad7947746200d234161769191f4748",
+  "upstream_framework": "G-OPD vendored verl v0.6.1",
+  "training_target": "single-node NVIDIA 8 GPU, FSDP student, synchronous vLLM rollout",
+  "default_method": "frozen teacher; sampled-token OPD; teacher-free GRPO; action-level contextual bandit",
+  "gpu_training_verified": false,
+  "model_weights_included": false,
+  "research_results_included": false,
+  "license": {
+    "original_gopd": "MIT, see LICENSE",
+    "vendored_verl": "Apache-2.0, see verl/LICENSE",
+    "mvp_outer_modules": "MIT, see LICENSE_MVP",
+    "mvp_verl_modifications": "Apache-2.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "models": {"student": "SIMULATED-STUDENT", "teacher": "SIMULATED-TEACHER"},
+  "data": {"manifest": "data/mvp/manifest.json", "reward": "numeric_demo"},
+  "training": {"warmup_steps": 2, "rl_steps": 3},
+  "experiment": {
+    "output_dir": "runs/simulation",
+    "rounds": 3,
+    "repeats": 2,
+    "max_total_gpu_hours": 10,
+    "validation_reserve_seconds": 0
+  }
+}

@@ -2,23 +2,25 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>论文总览 · OPD 与 RLVR</title>
-  <link rel="stylesheet" href="assets/reader.css">
-  <link rel="stylesheet" href="assets/katex/katex.min.css">
-  <script defer src="assets/katex/katex.min.js"></script>
-  <script defer src="assets/katex/contrib/auto-render.min.js"></script>
-  <script defer src="assets/mermaid.min.js"></script>
-  <script defer src="assets/reader.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPD / RLVR · 阅读笔记与实验代码</title>
+  <style>
+    :root{color-scheme:light; font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:#183028;background:#f5f7f4}
+    *{box-sizing:border-box}body{margin:0}main{max-width:900px;margin:0 auto;padding:72px 24px}
+    h1{font-size:clamp(28px,5vw,42px);line-height:1.25;margin:12px 0 20px}p{line-height:1.8;color:#4a5c54}
+    .label{font-size:13px;letter-spacing:.12em;color:#527964}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px;margin-top:36px}
+    article{border:1px solid #d9e2da;border-radius:16px;background:white;padding:28px}h2{font-size:23px;margin-top:0}
+    a{color:#195b3e;text-underline-offset:4px}a:focus-visible{outline:3px solid #d59b42;outline-offset:5px}.primary{display:inline-block;font-weight:650;margin:6px 0 12px}
+    footer{margin-top:36px;font-size:14px}
+  </style>
 </head>
-<body>
-  <header class="topbar"><nav class="top" aria-label="全站导航"><a class="brand" href="index.html">PAPER NOTES / OPD × RLVR</a><span>11 篇论文</span></nav></header>
-  <main class="index"><section class="hero"><p class="eyebrow">PAPER COLLECTION</p><h1>OPD 与 RLVR</h1><p class="intro">11 篇论文的具体做法、训练步骤与实验结果。</p></section>
-<section class="glossary" aria-label="基本概念"><div><h2>OPD：学生自己写，老师给反馈</h2><p>学生生成回答，老师看着已生成的内容，给下一 token 的概率或目标。学生据此更新。</p></div><div><h2>RLVR：用可验证结果学习</h2><p>学生先回答或行动，再根据答案检查、代码测试或环境结果获得奖励，用这些奖励更新模型。</p></div></section>
-<div class="toolbar" aria-label="论文筛选"><button class="filter active" aria-pressed="true">全部</button><button class="filter" aria-pressed="false">老师来源</button><button class="filter" aria-pressed="false">教学与成本</button><button class="filter" aria-pressed="false">训练顺序</button><button class="filter" aria-pressed="false">监督分配</button><input class="search" type="search" placeholder="搜索论文或关键词" aria-label="搜索论文"></div>
-<section class="cards" aria-label="论文列表"><a class="card" href="01-rise.html" data-paper="rise" data-group="老师来源"><div class="card-top"><span class="number">01</span><span class="tag">老师来源</span></div><h2>RISE</h2><p class="chinese">把刚才的 RL 更新放大，做成老师</p><p>学生先做一次 RL 更新。把新旧模型的变化再向前放大一点，得到临时老师；让学生学这个老师的预测，然后进入下一轮。</p><div class="go">阅读详解 →</div></a><a class="card" href="02-soar.html" data-paper="soar" data-group="教学与成本"><div class="card-top"><span class="number">02</span><span class="tag">教学与成本</span></div><h2>SOAR</h2><p class="chinese">老师先出题，学生练完真有进步，老师才得到奖励</p><p>老师生成一小组题和答案，学生在这些题上真实训练十步。再去原来的难题上测成绩，进步多少就给老师多少奖励，让老师逐渐学会出有帮助的题。</p><div class="go">阅读详解 →</div></a><a class="card" href="03-near-future.html" data-paper="near-future" data-group="老师来源"><div class="card-top"><span class="number">03</span><span class="tag">老师来源</span></div><h2>NPO / NPD / AutoNPO</h2><p class="chinese">用后面的 checkpoint 教前面的模型</p><p>先把模型往后训练，保存一个更强的版本；再恢复较早的模型，让后面的版本教它。NPO 传成功回答，NPD 传 token 概率，AutoNPO 决定什么时候回滚。</p><div class="go">阅读详解 →</div></a><a class="card" href="04-sequential.html" data-paper="sequential" data-group="训练顺序"><div class="card-top"><span class="number">04</span><span class="tag">训练顺序</span></div><h2>Sequential Beats Joint</h2><p class="chinese">先只做蒸馏，再只做 RL</p><p>把训练拆成两段：前一段只让学生学固定老师，后一段撤掉老师，只按任务奖励训练。论文把它和每一步同时混合 OPD、RL 的做法作比较。</p><div class="go">阅读详解 →</div></a><a class="card" href="05-opw.html" data-paper="opw" data-group="训练顺序"><div class="card-top"><span class="number">05</span><span class="tag">训练顺序</span></div><h2>OPW</h2><p class="chinese">先让老师纠正学生，再让学生自己做 RL</p><p>学生先自己做任务，老师在学生走到的位置给下一步建议。先这样训练 40 步，再撤掉老师，做 60 步 RL。论文要看：老师离开以后，学生是不是更容易学好。</p><div class="go">阅读详解 →</div></a><a class="card" href="06-metaopd.html" data-paper="metaopd" data-group="监督分配"><div class="card-top"><span class="number">06</span><span class="tag">监督分配</span></div><h2>MetaOPD</h2><p class="chinese">先试一次更新，再学怎样给 token 分权重</p><p>一个小网络给学生回答中的 token 分配训练权重。先按这些权重试着更新学生，再用参考解答检查这次更新有没有帮助；检查结果用来改小网络，随后才真正更新学生。</p><div class="go">阅读详解 →</div></a><a class="card" href="07-pear.html" data-paper="pear" data-group="训练顺序"><div class="card-top"><span class="number">07</span><span class="tag">训练顺序</span></div><h2>PEAR</h2><p class="chinese">根据后续示范是否好学，调整每一步的训练权重</p><p>数据还是原来的离线示范，PEAR 只改变每个位置学多大力度。它比较学生与数据来源模型的概率，降低那些后续整段示范对学生很难继续的位置的权重。</p><div class="go">阅读详解 →</div></a><a class="card" href="08-dr-opd.html" data-paper="dr-opd" data-group="监督分配"><div class="card-top"><span class="number">08</span><span class="tag">监督分配</span></div><h2>Dr. OPD</h2><p class="chinese">用任务奖励决定，哪些老师纠正要多学</p><p>老师会在很多 token 上纠正学生，但这些纠正未必同样有用。Dr. OPD 用结果奖励判断：加强某个位置的纠正，会不会帮助学生把题做对？有帮助就加权，没帮助就减权。</p><div class="go">阅读详解 →</div></a><a class="card" href="09-op-short.html" data-paper="op-short" data-group="教学与成本"><div class="card-top"><span class="number">09</span><span class="tag">教学与成本</span></div><h2>OP-Short</h2><p class="chinese">学生先走，老师接手几步，把这几步拿来训练</p><p>让学生自己执行任务，随机选一个位置交给老师。老师只继续少量交互步，这些短续写都保留，再用它们训练学生。论文比较这样花老师预算是否更划算。</p><div class="go">阅读详解 →</div></a><a class="card" href="10-rl-before-rl.html" data-paper="rl-before-rl" data-group="训练顺序"><div class="card-top"><span class="number">10</span><span class="tag">训练顺序</span></div><h2>RL Starts before RL</h2><p class="chinese">蒸馏以后，把 RL 接完再比较</p><p>作者训练几种不同的学生起点，再给它们相同的 RL。结果发现：刚蒸馏完分数更高的模型，接着 RL 后不一定更好；选择蒸馏方法时，评价终点要往后移。</p><div class="go">阅读详解 →</div></a><a class="card" href="11-atesd.html" data-paper="atesd" data-group="老师来源"><div class="card-top"><span class="number">11</span><span class="tag">老师来源</span></div><h2>ATESD</h2><p class="chinese">决定老师能看多少参考解答</p><p>学生只看题目，老师额外看参考解答，再给学生指导。ATESD 加一个小控制器，决定老师每次能看多少推理过程；最终答案始终给老师看。</p><div class="go">阅读详解 →</div></a></section><p class="noresults" hidden>没有匹配的论文。</p>
-<section class="section compare"><h2>方法对照</h2><div class="tablewrap"><table class="comparison"><thead><tr><th scope="col">论文</th><th scope="col">具体做什么</th><th scope="col">老师或数据</th><th scope="col">关键区别</th></tr></thead><tbody><tr><td>RISE</td><td>放大最近一次 RL 的变化来造老师</td><td>按新旧模型计算</td><td>每轮重新造老师再蒸馏</td></tr><tr><td>SOAR</td><td>学生练完老师题集，用真题进步奖励老师</td><td>可训练的出题模型</td><td>真实训练十步后评价</td></tr><tr><td>NPO / NPD / AutoNPO</td><td>用较晚 checkpoint 教较早模型</td><td>真实训练过的未来自己</td><td>NPO 搬回答，NPD 搬概率</td></tr><tr><td>Sequential Beats Joint</td><td>先纯 OPD，随后只做 RL</td><td>固定外部老师</td><td>在第二段撤掉老师信号</td></tr><tr><td>OPW</td><td>先用老师训练 40 步，再独立 RL</td><td>固定大老师</td><td>老师只在前一段参与</td></tr><tr><td>MetaOPD</td><td>试一次更新，再训练权重网络</td><td>固定老师 + 参考解答</td><td>试更新后恢复原学生再正式更新</td></tr><tr><td>PEAR</td><td>给离线示范的每个位置换权重</td><td>固定示范与来源概率</td><td>看后面的示范是否容易被学生继续</td></tr><tr><td>Dr. OPD</td><td>用奖励判断哪些纠正应该多学</td><td>固定老师 + 结果奖励</td><td>每轮计算各 token 的权重</td></tr><tr><td>OP-Short</td><td>随机交接，让老师只续写几轮</td><td>固定老师接管环境</td><td>把短续写留下来做 SFT</td></tr><tr><td>RL Starts before RL</td><td>比较不同起点接完 RL 的结果</td><td>固定外部老师</td><td>蒸馏后的高分不保证最后高分</td></tr><tr><td>ATESD</td><td>决定老师能看多少参考推理</td><td>同模型 + 部分参考解答</td><td>学生仍只看题目</td></tr></tbody></table></div><p class="note">不同论文的模型、任务和训练量不同，这里比较做法，不直接比较分数。</p></section></main>
-  <footer>实验数据引自原论文；论文与代码来源见各篇文末。</footer>
-</body>
-</html>
+<body><main>
+  <div class="label">OPD / RLVR</div>
+  <h1>阅读笔记与实验代码</h1>
+  <p>从论文方法解读，到 OPD warmup 与后续 RL 的实验实现。</p>
+  <div class="grid">
+    <article><h2>阅读笔记</h2><p>11 篇论文的中文解读、训练步骤、实验结果和原文 PDF，支持离线阅读。</p><a class="primary" href="reading-notes/index.html">进入阅读笔记 →</a><br><a href="https://github.com/Tasselszcx/opd-rlvr-paper-notes/tree/main/reading-notes">查看笔记文件</a></article>
+    <article><h2>实验代码</h2><p>G-OPD 元教学 MVP 的完整源码、训练配置与 B300 部署交接。</p><a class="primary" href="https://github.com/Tasselszcx/opd-rlvr-paper-notes/tree/main/repositories/gopd-meta-teaching-mvp">打开代码仓库 →</a><br><a href="https://github.com/Tasselszcx/opd-rlvr-paper-notes/blob/main/repositories/gopd-meta-teaching-mvp/HANDOFF_B300.md">阅读 B300 handoff</a></article>
+  </div>
+  <footer><a href="https://github.com/Tasselszcx/opd-rlvr-paper-notes">GitHub 仓库</a></footer>
+</main></body></html>

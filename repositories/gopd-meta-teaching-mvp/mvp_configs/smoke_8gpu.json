@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "models": {"student": "${STUDENT_MODEL}", "teacher": "${TEACHER_MODEL}"},
+  "data": {"manifest": "data/mvp/manifest.json", "reward": "numeric_demo"},
+  "training": {"n_gpus": 8, "rollout_tp": 2, "warmup_steps": 1, "rl_steps": 2, "checkpoint_every": 1},
+  "experiment": {"output_dir": "runs/smoke_8gpu", "rounds": 1, "repeats": 1, "max_total_gpu_hours": 8}
+}

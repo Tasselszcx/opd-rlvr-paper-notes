@@ -1,0 +1,25 @@
+{
+  "delivery_date": "2026-10-18",
+  "method_version": "0.1.0",
+  "delivery_revision": "github-handoff-2",
+  "upstream_repository": "https://github.com/RUCBM/G-OPD",
+  "upstream_commit": "37371a4c31ad7947746200d234161769191f4748",
+  "git_history": "source snapshot imported into opd-rlvr-paper-notes; upstream provenance retained",
+  "runtime_code_changed_from_v0_1_0": false,
+  "b300_gpu_training_verified": false,
+  "b300_environment_lock_included": false,
+  "model_weights_included": false,
+  "real_training_data_included": false,
+  "entry_document": "HANDOFF_B300.md",
+  "agent_prompt": "START_B300_CODEX.txt",
+  "initial_training_config": "mvp_configs/smoke_8gpu.json",
+  "do_not_use_on_b300": [
+    "scripts/mvp_environment.sh install-hopper",
+    "mvp_requirements_hopper.txt"
+  ],
+  "local_prior_validation": "validation/report.json; CPU only",
+  "github_repository": "https://github.com/Tasselszcx/opd-rlvr-paper-notes",
+  "github_directory": "repositories/gopd-meta-teaching-mvp",
+  "source_manifest": "SOURCE_FILES.sha256.json",
+  "source_manifest_scope": "current delivered files excluding the manifest itself and local generated artifacts"
+}

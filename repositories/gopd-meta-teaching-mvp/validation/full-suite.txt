@@ -1,0 +1,10 @@
+........................................................................ [ 52%]
+.................................................................        [100%]
+=============================== warnings summary ===============================
+work/gopd-meta-teaching-mvp/tests_mvp/test_hydra_contract.py::HydraContractTests::test_real_dataclass_instantiation_and_upstream_validation
+  ${PROJECT_ROOT}/verl/verl/utils/profiler/config.py:49: UserWarning: Torch profiler tool config is not fully supported now.
+    warnings.warn("Torch profiler tool config is not fully supported now.", stacklevel=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: ${VALIDATION_LOG_DIR}/full-suite.xml -
+137 passed, 1 warning in 26.26s

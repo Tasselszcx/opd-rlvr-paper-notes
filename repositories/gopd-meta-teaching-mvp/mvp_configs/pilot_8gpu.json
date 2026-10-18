@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "models": {"student": "${STUDENT_MODEL}", "teacher": "${TEACHER_MODEL}"},
+  "data": {"manifest": "data/research/manifest.json", "reward": "math_verify"},
+  "training": {"n_gpus": 8, "rollout_tp": 2, "warmup_steps": 5, "rl_steps": 20},
+  "experiment": {
+    "output_dir": "runs/pilot_8gpu",
+    "protocol": "fixed_steps",
+    "rounds": 3,
+    "repeats": 3,
+    "max_total_gpu_hours": 72,
+    "cost_penalty_per_gpu_hour": 0.01,
+    "teacher_mode": "fixed",
+    "promotion": "policy"
+  }
+}
